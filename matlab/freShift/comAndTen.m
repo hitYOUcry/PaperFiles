@@ -36,7 +36,7 @@ if mod(N,2) == 1
         end
 end
 new_fft = X_amp_new.*exp(1i*X_angle_new);
-y = cal_amp(ifft(new_fft));
+y = real(ifft(new_fft));
 end
 
 function f_o = getF(fa,fb,fc,fd,fs,f_i)

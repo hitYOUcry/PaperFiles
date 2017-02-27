@@ -43,8 +43,10 @@ frame_num = size(s,1);
 %midN = mid(N);
 for i = 1: frame_num
     x =  s(i,:);
- %  s_new(i,:) = comAndTen(x,1,7899,8000,1,7999,fs);
-    [NewFFT,s_new(i,:)] = alogOne(x,1000,1100,979,1131,fs);
+   %  s_new(i,:) = alogTwo(x,7000,fs);
+ % s_new(i,:) = comAndTen(x,1,7599,8000,1,7999,fs);
+  s_new(i,:) = alogCore(x,1000,3000,4000,5000,2000,5000,fs);
+ %   [NewFFT,s_new(i,:)] = alogOne(x,1000,1100,979,1131,fs);
     spec = 20 * log(inf + abs(fft(x)));
     Spe(i,:) = spec(1:midN);
     spec = abs(fft(s_new(i,:)));
@@ -134,17 +136,22 @@ y_new = i_enframe(s_new,inc);
 
 %{
 figure;
+t = (1:length(x))/fs;
+f = (1:midN)*fs/win_len;
+
 subplot(1,2,1)
+imagesc(t,f,Spe);
+axis xy; 
+colormap(jet)
+caxis([-30,10])
 
-imshow(Spe')
- axis xy; 
+%image((0:frame_num) * inc / fs,(0:midN)/N * fs,Spe')
+%axis xy
+%colormap(jet)
 
-image((0:frame_num) * inc / fs,(0:midN)/N * fs,Spe')
-axis xy
-%colormap(jet);
 subplot(1,2,2)
 image((0:frame_num) * inc / fs,(0:midN)/N * fs,Spe_new')
- axis xy; 
+axis xy; 
 colormap(jet);
 %}
 
@@ -152,16 +159,24 @@ colormap(jet);
 figure;
 subplot(1,2,1)
 %plot_spec(y,win_len,fs,-60,15);
-plotSpec2(y,win_len,fs);
+%plotSpec2(y,win_len,fs);
+n = N;
+spectrogram(y,n,n * 3 / 4,n,fs,'yaxis');
+colormap(jet);
+colorbar('off')
 title('原始语谱');
-xlabel('时间 / s')
-ylabel('频率 / Hz')
+%xlabel('时间 / s')
+%ylabel('频率 / Hz')
 subplot(1,2,2)
 %plot_spec(y_new,win_len,fs,-50,15);
-plotSpec2(y_new,win_len,fs);
+%plotSpec2(y_new,3*win_len,fs);
+spectrogram(y_new,n,n * 3 / 4,n,fs,'yaxis');
+colormap(jet);
+colorbar('off')
+axis([0 length(y)/fs 0 8]);
 title('算法输出语谱');
-xlabel('时间 / s')
-ylabel('频率 / Hz')
+%xlabel('时间 / s')
+%ylabel('频率 / Hz')
 
 
 %{
