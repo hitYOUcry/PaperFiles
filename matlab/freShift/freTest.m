@@ -3,8 +3,9 @@ clear all;
 close all;
 inf = 1E-10;
 %% read wav file
-%filename = 'sa1.wav';
 filename = 'sa1.wav';
+%filename = 'TX5_4.wav';
+%filename='si1549.wav';
 [y ,fs] = audioread(filename);
 y = y(:,1);
 n = size(y,1);
@@ -45,7 +46,7 @@ for i = 1: frame_num
     x =  s(i,:);
    %  s_new(i,:) = alogTwo(x,7000,fs);
  % s_new(i,:) = comAndTen(x,1,7599,8000,1,7999,fs);
-  s_new(i,:) = alogCore(x,1000,3000,4000,5000,2000,5000,fs);
+    s_new(i,:) = alogCore(x,300,1300,3400,6800,1200,3700,fs);
  %   [NewFFT,s_new(i,:)] = alogOne(x,1000,1100,979,1131,fs);
     spec = 20 * log(inf + abs(fft(x)));
     Spe(i,:) = spec(1:midN);
@@ -134,28 +135,43 @@ end
 y_new = i_enframe(s_new,inc);
 
 
-%{
+
 figure;
-t = (1:length(x))/fs;
+t = (1:length(y))/fs;
 f = (1:midN)*fs/win_len;
 
-subplot(1,2,1)
-imagesc(t,f,Spe);
+
+subplot(2,2,1)
+plot(t,y);
+title('原始语音');
+
+subplot(2,2,2)
+plot(t,y_new);
+title('补偿后语音');
+
+
+subplot(2,2,3)
+imagesc(t,f,Spe');
 axis xy; 
 colormap(jet)
-caxis([-30,10])
+title('原始频谱');
+xlabel('时间 / s')
+ylabel('频率 / Hz')
 
 %image((0:frame_num) * inc / fs,(0:midN)/N * fs,Spe')
 %axis xy
 %colormap(jet)
 
-subplot(1,2,2)
-image((0:frame_num) * inc / fs,(0:midN)/N * fs,Spe_new')
+subplot(2,2,4)
+imagesc(t,f,Spe_new');
 axis xy; 
 colormap(jet);
+title('伸缩后频谱');
+xlabel('时间 / s')
+ylabel('频率 / Hz')
 %}
 
-
+%{
 figure;
 subplot(1,2,1)
 %plot_spec(y,win_len,fs,-60,15);
@@ -179,7 +195,7 @@ title('算法输出语谱');
 %ylabel('频率 / Hz')
 
 
-%{
+
 fprintf('Press any key to play the first wav...\n');
 pause;
 p = audioplayer(y, fs);
@@ -189,8 +205,8 @@ fprintf('Press any key to play the second wav...\n');
 pause;
 p = audioplayer(3 * y_new, fs);
 play(p);
-%}
 
+%}
 
 %{
 figure;

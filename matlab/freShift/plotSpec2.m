@@ -25,4 +25,4 @@ f = (1:midN)*fs/win_len;
 imagesc(t,f,spec');
  axis xy; 
  colormap(jet)
- caxis([-30,10])
+ %caxis([-30,10])

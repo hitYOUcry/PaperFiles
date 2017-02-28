@@ -14,7 +14,7 @@ Nw=1024;
 Ns=256;
 
 %[y,SO] = FunFreqComp1(s,fs,1875,2125,2,Nw,Ns);
-[y,SO] = FunFreqComp2(s,fs,3000,3500,2,Nw,Ns);  % test phase
+[y,SO] = FunFreqComp2(s,fs,1000,1200,2,Nw,Ns);  % test phase
 
 figure(1);
 subplot(2,2,1),plot(t,s),axis([0 1.4 -1 1]),xlabel('Ê±¼ä /Ãë'),ylabel('·ù¶È');

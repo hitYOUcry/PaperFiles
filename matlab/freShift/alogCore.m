@@ -3,6 +3,8 @@ function y = alogCore(x,fa,fb,fc,fd,fbb,fcc,fs)
 % cal fft of original signal
 N = length(x);
 X = fft(x,N,2);
+X_angle = angle(X);
+X = abs(X);
 
 
 % cal delta f
@@ -18,42 +20,83 @@ nd = floor(fd/delta_f);
 nbb = floor(fbb/delta_f);
 ncc = floor(fcc/delta_f);
 k = 1;
-
+m = 1;
 
 % cal compress segment
-Xab = X(na:nbb);
 T = nb - nbb;
-L = floor((nb - na)/T);
-for i = 1:T
-    for j = 1:(L-1)
-         Xab((i-1) * L + j) = X(na + (i-1) * L + j- 1);
+if T == 0
+    Xab = X(na+1:nbb);
+else
+    Xab = zeros(1,nbb-na);
+    L = floor((nb - na)/T);
+    remain = mod(nb-na,T);
+    for i = 1:T
+        for j = 1:(L-1)
+            m = (i-1) * (L-1) + j;
+            k =  na + (i-1) * L + j;
+            Xab(m) = X(k);
+        end
     end
+    for i = 1:remain
+        m = m+1;
+        k = k+1;
+         Xab(m) = X(k);
+    end 
 end
+%
+
+
 
 % cal stretch segment
-Xbc = X(nbb:ncc);
-temp = X(nb:nc);
-R = floor((ncc-nbb)/(nc-nb))+ 1 * (mod((ncc-nbb),(nc-nb)~=0));
+temp = X(nb+1:nc);
+R = floor((ncc-nbb)/(nc-nb))+ 1;
 ST = interp(temp,R);
+%Xbc = ST(1:ncc-nbb);
+Xbc = zeros(1,ncc-nbb);
 L1 = R * length(temp);
-L2 = ncc - nbb + 1;
+L2 = ncc - nbb;
 T = L1 - L2;
 L = floor(L1 / T);
+remain = mod(L1,T);
 for i = 1:T
     for j = 1:(L-1)
-         Xbc((i-1) * L + j) = ST((i-1) * L + j);
+         m = (i-1) * (L-1) + j;
+         k =  (i-1) * L + j;
+         Xbc(m) = ST(k);
+    end
+end
+for i = 1:remain
+    m = m+1;
+    k = k+1;
+    Xbc(m) = ST(k);
+end
+
+
+% cal compress segment
+T = (nd - nc) - (nd - ncc);
+if T == 0
+    Xcd = X(ncc+1:nd);
+else
+    Xcd = zeros(1,nd - ncc);
+    L = floor((nd - nc) / T);
+    remain = mod(nd-nc,T);
+    for i = 1:T
+        for j = 1:(L-1)
+             m = (i-1) * (L-1) + j;
+             k = nc + (i-1) * L + j;
+             Xcd(m) = X(k);
+        end
+    end
+    for i = 1:remain
+        m = m+1;
+        k = k+1;
+        Xcd(m) = X(k);
     end
 end
 
-% cal compress segment
-Xcd = X(ncc:nd);
-T = (nd - nc) - (nd - ncc);
-L = floor((nd - nc) / T);
-for i = 1:T
-    for j = 1:(L-1)
-         Xcd((i-1) * L + j) = X(nc + (i-1) * L + j - 1);
-    end
-end
+
+
+
 % reconstruction
 XNew(1:na) = X(1:na);
 XNew(na+1:nbb) = Xab(1:nbb-na);
@@ -62,14 +105,16 @@ XNew(ncc+1:nd) = Xcd(1:nd - ncc);
 XNew(nd+1:M) = X(nd+1:M);
 if mod(N,2) == 1
         for j = M:-1:2
-         XNew(2 * M - j + 1) = XNew(j);
+            XNew(2 * M - j + 1) = XNew(j);
         end
     else
         for j = (M-1):-1:2
             XNew(2 * M - j) = XNew(j);
         end
 end
-y = ifft(XNew, N, 2);
+
+XNew = XNew.*exp(1i*X_angle);
+y = (ifft(XNew, N, 2));
 end
 
 
