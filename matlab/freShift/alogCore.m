@@ -40,7 +40,7 @@ else
     for i = 1:remain
         m = m+1;
         k = k+1;
-         Xab(m) = X(k);
+        Xab(m) = X(k);
     end 
 end
 %
@@ -48,28 +48,35 @@ end
 
 
 % cal stretch segment
-temp = X(nb+1:nc);
-R = floor((ncc-nbb)/(nc-nb))+ 1;
-ST = interp(temp,R);
-%Xbc = ST(1:ncc-nbb);
-Xbc = zeros(1,ncc-nbb);
-L1 = R * length(temp);
-L2 = ncc - nbb;
-T = L1 - L2;
-L = floor(L1 / T);
-remain = mod(L1,T);
-for i = 1:T
-    for j = 1:(L-1)
-         m = (i-1) * (L-1) + j;
-         k =  (i-1) * L + j;
-         Xbc(m) = ST(k);
+T = nc-nb;
+if T == 0
+    Xbc = zeros(1,ncc-nbb);
+else
+    temp = X(nb+1:nc);
+    R = floor((ncc-nbb)/(nc-nb))+ 1;
+    %ST = interp(temp,R);
+    ST = resample(temp,R*length(temp),length(temp));
+    %Xbc = ST(1:ncc-nbb);
+    Xbc = zeros(1,ncc-nbb);
+    L1 = R * length(temp);
+    L2 = ncc - nbb;
+    T = L1 - L2;
+    L = floor(L1 / T);
+    remain = mod(L1,T);
+    for i = 1:T
+        for j = 1:(L-1)
+             m = (i-1) * (L-1) + j;
+             k =  (i-1) * L + j;
+             Xbc(m) = ST(k);
+        end
+    end
+    for i = 1:remain
+        m = m+1;
+        k = k+1;
+        Xbc(m) = ST(k);
     end
 end
-for i = 1:remain
-    m = m+1;
-    k = k+1;
-    Xbc(m) = ST(k);
-end
+
 
 
 % cal compress segment

@@ -46,13 +46,13 @@ for i = 1: frame_num
     x =  s(i,:);
    %  s_new(i,:) = alogTwo(x,7000,fs);
  % s_new(i,:) = comAndTen(x,1,7599,8000,1,7999,fs);
-    s_new(i,:) = alogCore(x,300,1300,3400,6800,1200,3700,fs);
+    s_new(i,:) = alogCore(x,900,8000,8000,8000,5980,8000,fs);
  %   [NewFFT,s_new(i,:)] = alogOne(x,1000,1100,979,1131,fs);
     spec = 20 * log(inf + abs(fft(x)));
-    Spe(i,:) = spec(1:midN);
+    Spe(i,:) = spec(1:(midN-1));
     spec = abs(fft(s_new(i,:)));
     spec = 20 * log(inf + spec);
-    Spe_new(i,:) = spec(1:midN);
+    Spe_new(i,:) = spec(1:(midN-1));
    %{
     S = fft(x,N);
     S_new = zeros(1,new_N);
@@ -138,7 +138,7 @@ y_new = i_enframe(s_new,inc);
 
 figure;
 t = (1:length(y))/fs;
-f = (1:midN)*fs/win_len;
+f = (1:(midN-1))*fs/win_len;
 
 
 subplot(2,2,1)
@@ -163,12 +163,14 @@ ylabel('频率 / Hz')
 %colormap(jet)
 
 subplot(2,2,4)
+%f = (1:(midN*0.75))*fs/win_len;
 imagesc(t,f,Spe_new');
 axis xy; 
 colormap(jet);
 title('伸缩后频谱');
 xlabel('时间 / s')
 ylabel('频率 / Hz')
+caxis([-200,30])
 %}
 
 %{
