@@ -1,0 +1,134 @@
+        public static int NAL2_Kernel(ref Target target, int[] ACL, int[] BCL, int[] UCL, double[] RECD, string type)
+        {
+
+            //*******************   NAL calc *********************/
+            //nal calculates target with 15dB reserve gain
+            //reserve gain is subtracted at this point in the calculation
+            //Returns NZ_Target structure with 50dB, 80dB Gain values as well as
+            // Estimated MPO level.
+            //int result = DataCheck(ref ACL);
+            //if (result != 0)
+            //    return result;
+            //result = DataCheck(ref UCL);
+            //if (result != 0)
+            //    return result;
+
+            bool[] ABUL = new bool[3] { true, true, true };//气骨导存在标志
+            int result = DataCheck(ref ACL);
+            if (result != 0)
+                ABUL[0] = false;
+            result = DataCheck(ref BCL);
+            if (result != 0)
+                ABUL[1] = false;
+            result = DataCheck(ref UCL);
+            if (result != 0)
+                ABUL[2] = false;
+
+            if (ABUL[0] == false && ABUL[1] == false)//都不存在
+            {
+                return 21;
+            }
+
+            if (ABUL[0] == true && ABUL[1] == false)//骨导不存在时填充
+            {
+                for (int i = 0; i < ACL.Length; i++)
+                {
+                    BCL[i] = ACL[i];
+                }
+            }
+            if (ABUL[1] == true && ABUL[0] == false)//气导不存在时填充
+            {
+                for (int i = 0; i < BCL.Length; i++)
+                {
+                    ACL[i] = BCL[i];
+                }
+            }
+
+            short sum;
+            short a;
+            float CRlow, CRhigh, CRAve;
+            float DeltaGain;
+            short HLindex;
+
+            float[] Gain50 = new float[25] { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 4.2f, 9.4f, 12.6f,
+        16.8f, 21.0f, 24.2f, 29.4f, 33.6f, 37.4f, 40.2f, 44.0f, 46.4f,
+        49.8f, 52.6f, 56.0f, 58.8f, 62.2f, 65.0f, 68.0f, 70.0f };//0-120db
+
+            float[] Gain65 = new float[25]{ 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 3.0f, 6.0f, 9.0f, 12.0f, 15.0f,
+        18.0f, 21.0f, 24.0f, 29.0f, 33.0f, 38.0f, 41.0f, 45.0f,
+        49.0f, 53.0f, 57.0f, 61.0f, 65.0f, 69.0f, 74.0f };
+
+            float[] Gain80 = new float[25]{ 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.5f, 3.0f, 4.5f, 6.0f, 8.1f, 
+        10.5f, 12.6f, 15.6f, 19.4f, 22.5f, 26.6f, 29.0f, 33.0f, 36.6f, 40.4f, 44.4f, 
+        48.1f, 49.5f, 55.1f, 58.0f };
+
+
+            //500Hz, 1kHz,2kHz
+            sum = (short)(ACL[2] + ACL[4] + ACL[6]);
+
+            target.sng50[0] = (float)((.05 * sum) + (.31 * ACL[0] - 5 - 15 - 8));//125Hz  **Estimated
+            target.sng50[1] = (float)((.05 * sum) + (.31 * ACL[1] - 1 - 15 - 8));//250Hz
+            target.sng50[2] = (float)((.05 * sum) + (.31 * ACL[2] + 9 - 15 - 8));//500
+            target.sng50[3] = (float)((.05 * sum) + (.31 * ACL[3] + 12 - 15 - 8));//750 **Estimated
+            target.sng50[4] = (float)((.05 * sum) + (.31 * ACL[4] + 16 - 15 - 8));//subtract 15 to eliminate reserve gain
+            target.sng50[5] = (float)((.05 * sum) + (.31 * ACL[5] + 15 - 15 - 8));//1.5kHx
+            target.sng50[6] = (float)((.05 * sum) + (.31 * ACL[6] + 14 - 15 - 8));//2kHx
+            target.sng50[7] = (float)((.05 * sum) + (.31 * ACL[7] + 15 - 15 - 8));//3kHx
+            target.sng50[8] = (float)((.05 * sum) + (.31 * ACL[8] + 13 - 15 - 8));//4kHx
+            target.sng50[9] = (float)((.05 * sum) + (.31 * ACL[9] - 2 - 15 - 8));//6kHz  **Estimated
+            target.sng50[10] = (float)((.05 * sum) + (.31 * ACL[10] - 17 - 15 - 8));//8kHz  **Estimated
+
+
+            //Use Fig6 tables and Audiometric thresholds to determine CR's for each audiometric freq
+
+            for (a = 0; a <= 10; a++)
+            {
+
+                //HL value divided by 5 gives the index to the Fig6 look tables
+                //Fig6 provides a low input level CR and a High input level CR
+                //This function will average the two giving a estimated CR at all
+                //target frequencies
+                //80 dB target will be 50dB output * CR
+
+                HLindex = (short)(ACL[a] / 5);
+                CRlow = 1 / (1 - ((Gain50[HLindex] - Gain65[HLindex]) / 15));
+                CRhigh = 1 / (1 - ((Gain65[HLindex] - Gain80[HLindex]) / 15));
+                CRAve = (CRlow + CRhigh) / 2;
+                DeltaGain = ((1 - (1 / CRAve)) * 15);
+                //target.sng60[a] = target.sng50[a] - DeltaGain / 3;
+                target.sng80[a] = target.sng50[a] - DeltaGain;
+            }
+            for (int i = 0; i < 11; i++)
+            {
+                if (ACL[i] > BCL[i])
+                {
+                    target.sng50[i] = (float)(0.75 * (ACL[i] - BCL[i]) + target.sng50[i] * BCL[i] / ACL[i]);
+                    target.sng80[i] = (float)(0.75 * (ACL[i] - BCL[i]) + target.sng80[i] * BCL[i] / ACL[i]);
+                }
+            }
+
+            //set reserve gain
+            target.ResGain = 15;
+
+            //set MPO
+            // 	if (m_audDat.speechUCL < 50) //Speech UCL invalid
+            // 		//use Pasco prediction
+            // 		m_Tardat.MPO = static_cast<short>(((m_Interp_audDat.element[4] + 115) / 2)+15);
+            // 	else
+            // 		m_Tardat.MPO = m_audDat.speechUCL + 15;
+
+            //float temp = (ACL[2] + ACL[4] + ACL[6]) / 3;
+            //if (temp < 60)
+            //    target.MPO = (short)(temp * 0.3 + 89);
+            //else if (temp < 80)
+            //    target.MPO = (short)(temp * 0.533 + 75);
+            //else
+            //    target.MPO = (short)(temp * 0.533 + 75);
+
+            if (UCL[0] < 50) //Speech UCL invalid
+                //use Pasco prediction
+                target.MPO = (short)(((ACL[4] + 115) / 2) + 15);
+            else
+                target.MPO = (short)(UCL[0] + 15);
+            return result;
+        }

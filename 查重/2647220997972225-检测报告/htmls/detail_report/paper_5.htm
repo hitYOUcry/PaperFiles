@@ -1,0 +1,446 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>PTcheck论文检测报告</title>
+		<link rel="stylesheet" href="../css/base.css" />
+		<style type="text/css">
+		a {
+    color: #0796fe;
+}
+a:hover{
+    color:#0796fe!important;
+}
+			.mainContainer {
+				padding: 20px;
+	
+			}
+			
+			.navigation span {
+				display: inline-block;
+				padding-left: 5px;
+				padding-right: 5px;
+				color: #666;
+			}
+			
+			.btn_gray {
+				border: solid 1px #dddddd;
+				background-color: #eeeeee;
+				border-radius: 5px;
+				cursor: pointer;
+			}
+			
+			.btn_gray:hover,
+			.btn_blue {
+				background-color: #0099ff;
+				border: solid 1px #0099ff;
+				color: #fff!important;
+				border-radius: 5px;
+				cursor: pointer;
+			}
+			.para{
+				padding-top:20px;
+			}
+			
+			.duanluo{
+				padding-left:20px;
+				
+				padding-bottom: 5px;
+			}
+			.duanluo span{
+				display: inline-block;
+				padding-left:5px;
+				padding-right: 5px;
+				border: solid 1px #999;
+				color:#999;
+			}
+			.l{
+				line-height: 20px;
+				padding-bottom: 5px;
+			}
+			.l span{
+				color:#333;
+			}
+			.mymodify{
+				font-size:12px;
+			}
+			.mymodify textarea{
+				width:98%;
+				height:100px;
+				color:#333;
+				clear:both;
+			}
+			textarea{
+				padding:10px;
+				line-height: 20px;
+			}
+		</style>
+		<script type="text/javascript">
+
+        var isstorage=false;
+        var danhao;
+        var result= new Array();
+         function trimStr(str) {
+
+            if ((typeof (str) != "string") || !str) {
+
+                return "";
+
+            }
+
+            return str.replace(/(^\s*)|(\s*$)/g, "");
+
+        }
+          
+        function myclick() {
+            window.parent.parent.ViewMain.window.location.href = "../../htmls/jianchong_.htm";
+        }
+        function submitPart(obj, target) {
+            var parent = target.parentNode;
+            if(parent.getAttribute("data")=="add"){
+              var mynext = parent.nextSibling;
+              parent.setAttribute("data","remove");
+              parent.parentNode.removeChild(mynext);
+            }
+            else{
+            	parent.setAttribute("data","add");
+            	var temphtml = document.createElement("div");
+                temphtml.innerHTML = "<input type=\"hidden\" value=\""+ parent.getAttribute("paraseq") +"\"><div name=\"mymodify\" class=\"mymodify\" >"
+					+"<div class=\"a999\">改重内容（请对本句修改之后，点击“临时保存”，然后进入报告左侧“修改文档”页面中获取修改后的内容）：</div>"
+					+"<div><textarea>"+obj
+					+"</textarea>"
+					+"</div>"
+					+"<div align=\"right\" class=\"a999\" style=\"margin-top:14px;\">（注意：改完请及时到“修改文档”复制到原文）<span class=\"btn-gray btn a333\" onclick=\"mysave(this)\">临时保存</span></div>"
+				+"</div>";
+            	   parent.parentNode.insertBefore(temphtml, null);
+            }
+
+        }
+
+		function myNavigate(){
+		 document.getElementById("a_url").click();
+		}
+       
+        function mysave(target) {
+            var tempsen = trimStr(target.parentNode.previousSibling.lastChild.value.replace(/\"/g,"\\\"").replace(/\'/g,"\\\'"));
+            var paraseq = target.parentNode.parentNode.parentNode.firstChild.value;            
+            var mydiv = target.parentNode.parentNode.parentNode.previousSibling;
+             if (mydiv.nodeName == "#text") {
+                mydiv = mydiv.previousSibling;
+            }
+             
+            mydiv.lastChild.setAttribute("onclick", "submitPart('" + tempsen + "',this)");
+           mydiv.setAttribute("data","remove");
+           if (mydiv.firstChild.innerHTML != "已修改") {
+                var xiugai = document.createElement("span");
+                xiugai.setAttribute("style", "font-size:12px;color:#00AEAE;margin-right:10px;");
+                xiugai.innerHTML = "已修改";
+                mydiv.insertBefore(xiugai, mydiv.lastChild);
+               }
+            
+            var parent = target.parentNode.parentNode.parentNode;
+            parent.parentNode.removeChild(parent);
+            if(!isstorage)
+            {
+            window.parent.parent.parent.myset(paraseq, tempsen);
+            }
+            else
+            {
+            myset(paraseq, tempsen);
+            }
+        }
+        window.onload = function() {
+            danhao = document.getElementById("danhao").value;
+            if (window.localStorage) {
+                isstorage = true;
+            }
+            if (!isstorage) {
+                result = window.parent.parent.parent.modifyPara;
+                
+            }
+            else {
+                var temp = localStorage.getItem(danhao);
+                if (temp) {
+                    result = eval("(" + temp + ")");
+                }
+            }
+            if (result) {
+            	
+                for (var i = 0; i < result.length; i++) {
+                	
+                    //var all = $(":hidden");
+                    var all = getClass("div","modify");
+                   
+                    for (var j = 0; j < all.length; j++) {
+                        if (all[j].getAttribute("paraseq") == result[i].para) {
+                        	
+                            var xiugai = document.createElement("span");
+                            xiugai.setAttribute("style", "font-size:12px;color:#00AEAE;margin-right:10px;");
+                            xiugai.innerHTML = "已修改";
+                            all[j].insertBefore(xiugai, all[j].lastChild);
+                            all[j].lastChild.setAttribute("onclick", "submitPart('" + result[i].text.replace(/\"/g,"\\\"").replace(/\'/g,"\\\'") + "',this)");
+                        }
+                    }
+
+                }
+            }  
+        }
+
+
+        function mydivclick(e,obj) {
+            if (e.target.tagName.toUpperCase() != "INPUT") {
+                obj.lastChild.previousSibling.click();
+            }
+        }
+
+        function getClass(tagname, className) { //tagname指元素，className指class的值
+            var tagname = document.getElementsByTagName(tagname);  //获取指定元素
+            var tagnameAll = [];     //这个数组用于存储所有符合条件的元素
+            for (var i = 0; i < tagname.length; i++) {     //遍历获得的元素
+                if (tagname[i].className == className) {     //如果获得的元素中的class的值等于指定的类名，就赋值给tagnameAll
+                    tagnameAll[tagnameAll.length] = tagname[i];
+                }
+            }
+            return tagnameAll;
+
+        }
+
+       
+        
+        
+         function myset(paraseq, sen) {
+         	
+            var reg = new RegExp("\"", "g")
+            var model = "{\"para\":\"" + paraseq + "\",\"text\": \"" + sen + "\"}";
+            var mo = eval("(" + model + ")");
+            var exist = false;
+            for (var i = 0; i < result.length; i++) {
+                if (mo.para == result[i].para) {
+                    exist = true;
+                    result[i].text = mo.text;
+                }
+            }
+            if (!exist) {
+                result.push(mo);
+            }
+            localStorage.removeItem(danhao);
+            localStorage.setItem(danhao, json_encode(result));
+        }
+        
+        function json_decode(str_json) {
+            // Decodes the JSON representation into a PHP value  
+            //  
+            // version: 906.1806  
+            // discuss at: http://phpjs.org/functions/json_decode  
+            // +      original by: Public Domain (http://www.json.org/json2.js)  
+            // + reimplemented by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)  
+            // + improved by: T.J. Leahy  
+            // *     example 1: json_decode('[\n    "e",\n    {\n    "pluribus": "unum"\n}\n]');  
+            // *     returns 1: ['e', {pluribus: 'unum'}]  
+            /* 
+            http://www.JSON.org/json2.js 
+            2008-11-19 
+            Public Domain. 
+            NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK. 
+            See http://www.JSON.org/js.html 
+            */
+
+            var json = this.window.JSON;
+            if (typeof json === 'object' && typeof json.parse === 'function') {
+                return json.parse(str_json);
+            }
+
+            var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
+            var j;
+            var text = str_json;
+
+            // Parsing happens in four stages. In the first stage, we replace certain  
+            // Unicode characters with escape sequences. JavaScript handles many characters  
+            // incorrectly, either silently deleting them, or treating them as line endings.  
+            cx.lastIndex = 0;
+            if (cx.test(text)) {
+                text = text.replace(cx, function(a) {
+                    return '\\u' +
+            ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+                });
+            }
+
+            // In the second stage, we run the text against regular expressions that look  
+            // for non-JSON patterns. We are especially concerned with '()' and 'new'  
+            // because they can cause invocation, and '=' because it can cause mutation.  
+            // But just to be safe, we want to reject all unexpected forms.  
+
+            // We split the second stage into 4 regexp operations in order to work around  
+            // crippling inefficiencies in IE's and Safari's regexp engines. First we  
+            // replace the JSON backslash pairs with '@' (a non-JSON character). Second, we  
+            // replace all simple value tokens with ']' characters. Third, we delete all  
+            // open brackets that follow a colon or comma or that begin the text. Finally,  
+            // we look to see that the remaining characters are only whitespace or ']' or  
+            // ',' or ':' or '{' or '}'. If that is so, then the text is safe for eval.  
+            if (/^[\],:{}\s]*$/.
+        test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@').
+            replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').
+            replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
+
+                // In the third stage we use the eval function to compile the text into a  
+                // JavaScript structure. The '{' operator is subject to a syntactic ambiguity  
+                // in JavaScript: it can begin a block or an object literal. We wrap the text  
+                // in parens to eliminate the ambiguity.  
+
+                j = eval('(' + text + ')');
+
+                return j;
+            }
+
+            // If the text is not JSON parseable, then a SyntaxError is thrown.  
+            throw new SyntaxError('json_decode');
+        }
+
+        function json_encode(mixed_val) {
+            // Returns the JSON representation of a value  
+            //  
+            // version: 906.1806  
+            // discuss at: http://phpjs.org/functions/json_encode  
+            // +      original by: Public Domain (http://www.json.org/json2.js)  
+            // + reimplemented by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)  
+            // + improved by: T.J. Leahy  
+            // *     example 1: json_encode(['e', {pluribus: 'unum'}]);  
+            // *     returns 1: '[\n    "e",\n    {\n    "pluribus": "unum"\n}\n]'  
+            /* 
+            http://www.JSON.org/json2.js 
+            2008-11-19 
+            Public Domain. 
+            NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK. 
+            See http://www.JSON.org/js.html 
+            */
+            var json = this.window.JSON;
+            if (typeof json === 'object' && typeof json.stringify === 'function') {
+                return json.stringify(mixed_val);
+            }
+
+            var value = mixed_val;
+
+            var quote = function(string) {
+                var escapable = /[\\\"\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
+                var meta = {    // table of character substitutions  
+                    '\b': '\\b',
+                    '\t': '\\t',
+                    '\n': '\\n',
+                    '\f': '\\f',
+                    '\r': '\\r',
+                    '"': '\\"',
+                    '\\': '\\\\'
+                };
+
+                escapable.lastIndex = 0;
+                return escapable.test(string) ?
+        '"' + string.replace(escapable, function(a) {
+            var c = meta[a];
+            return typeof c === 'string' ? c :
+            '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+        }) + '"' :
+        '"' + string + '"';
+            };
+
+            var str = function(key, holder) {
+                var gap = '';
+                var indent = '    ';
+                var i = 0;          // The loop counter.  
+                var k = '';          // The member key.  
+                var v = '';          // The member value.  
+                var length = 0;
+                var mind = gap;
+                var partial = [];
+                var value = holder[key];
+
+                // If the value has a toJSON method, call it to obtain a replacement value.  
+                if (value && typeof value === 'object' &&
+            typeof value.toJSON === 'function') {
+                    value = value.toJSON(key);
+                }
+
+                // What happens next depends on the value's type.  
+                switch (typeof value) {
+                    case 'string':
+                        return quote(value);
+
+                    case 'number':
+                        // JSON numbers must be finite. Encode non-finite numbers as null.  
+                        return isFinite(value) ? String(value) : 'null';
+
+                    case 'boolean':
+                    case 'null':
+                        // If the value is a boolean or null, convert it to a string. Note:  
+                        // typeof null does not produce 'null'. The case is included here in  
+                        // the remote chance that this gets fixed someday.  
+
+                        return String(value);
+
+                    case 'object':
+                        // If the type is 'object', we might be dealing with an object or an array or  
+                        // null.  
+                        // Due to a specification blunder in ECMAScript, typeof null is 'object',  
+                        // so watch out for that case.  
+                        if (!value) {
+                            return 'null';
+                        }
+
+                        // Make an array to hold the partial results of stringifying this object value.  
+                        gap += indent;
+                        partial = [];
+
+                        // Is the value an array?  
+                        if (Object.prototype.toString.apply(value) === '[object Array]') {
+                            // The value is an array. Stringify every element. Use null as a placeholder  
+                            // for non-JSON values.  
+
+                            length = value.length;
+                            for (i = 0; i < length; i += 1) {
+                                partial[i] = str(i, value) || 'null';
+                            }
+
+                            // Join all of the elements together, separated with commas, and wrap them in  
+                            // brackets.  
+                            v = partial.length === 0 ? '[]' :
+                    gap ? '[\n' + gap +
+                    partial.join(',\n' + gap) + '\n' +
+                    mind + ']' :
+                    '[' + partial.join(',') + ']';
+                            gap = mind;
+                            return v;
+                        }
+
+                        // Iterate through all of the keys in the object.  
+                        for (k in value) {
+                            if (Object.hasOwnProperty.call(value, k)) {
+                                v = str(k, value);
+                                if (v) {
+                                    partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                                }
+                            }
+                        }
+
+                        // Join all of the member texts together, separated with commas,  
+                        // and wrap them in braces.  
+                        v = partial.length === 0 ? '{}' :
+                gap ? '{\n' + gap + partial.join(',\n' + gap) + '\n' +
+                mind + '}' : '{' + partial.join(',') + '}';
+                        gap = mind;
+                        return v;
+                }
+            };
+
+            // Make a fake root object containing our value under the key of ''.  
+            // Return the result of stringifying the value.  
+            return str('', {
+                '': value
+            });
+        } 
+       
+    </script>
+	</head>
+
+	<body><a href="http://www.ptcheck.com/tea/segment.aspx" target="_blank" id="a_url" style="display:none;" ></a> <input type="hidden" id="danhao" value="2647220997972225" /><div class="mainContainer"><div align="center" class="navigation"><a href="paper_1.htm"><span class="btn_gray">首页</span></a><a  href="paper_4.htm"><span class="btn_gray">上一页</span></a><a href="paper_6.htm"><span class="btn_gray">下一页</span></a><a href="paper_6.htm">	<span class="btn_gray">尾页</span></a><span>页码：5/6页</span></div><div class="zhengwen"><div class="para"><div class="duanluo"><span>337</span></div><div class="l"><span style="margin-left:25px"></span><span >	原始语音信号频率分布在0-8000Hz的频段内，经由线性压缩处理之后信号频谱处在0-4000Hz以内。 </span><span >由于是线性压缩，频谱间的相对位置关系被保存下来。 </span><span >通过适当的选取频谱压缩的参数，可将不在可听范围内的语音变换至较低频的可听范围之内，对提升言语识别率具有一定的帮助， </span><span >但是频谱的大幅压缩会导致变换后语音的一定失真，患者需要一段时间适应压缩后的语音； </span><span >同时，频谱中许多时间段内其频谱分布范围本身就已经是在可听阈内，无需压缩处理，然而由于基本的移频压缩算法不存在参数动态自适应以及输入信息检测机制， </span><span >这些本可以无需压缩的语音片段被强制压缩，造成一些没必要的语音失真。 </span></div><div class="modify" align="right" paraseq="336"><span class="btn btn-blue" onclick="submitPart('原始语音信号频率分布在0-8000Hz的频段内，经由线性压缩处理之后信号频谱处在0-4000Hz以内。由于是线性压缩，频谱间的相对位置关系被保存下来。通过适当的选取频谱压缩的参数，可将不在可听范围内的语音变换至较低频的可听范围之内，对提升言语识别率具有一定的帮助，但是频谱的大幅压缩会导致变换后语音的一定失真，患者需要一段时间适应压缩后的语音；同时，频谱中许多时间段内其频谱分布范围本身就已经是在可听阈内，无需压缩处理，然而由于基本的移频压缩算法不存在参数动态自适应以及输入信息检测机制，这些本可以无需压缩的语音片段被强制压缩，造成一些没必要的语音失真。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>338</span></div><div class="l"><span style="margin-left:25px"></span><span >	频谱搬移 </span></div></div><div class="para"><div class="duanluo"><span>339</span></div><div class="l"><span style="margin-left:25px"></span><span >频谱搬移类算法的目的是将部分高频段频谱搬移至目标频段。 </span><span >与频谱压缩不同的是，原始频段所在频谱不会被压缩，只是转移或平移至目标区域。 </span><span >一般而言，由于频谱搬移算法中目标频段的最低频低于起始频率，故在搬移得到的频谱与剩余频谱叠加时会有一定的重叠，言语特征会发生改变。 </span><span >频谱搬移算法的输入频率与输出频率间对应关系如下图： </span></div><div class="modify" align="right" paraseq="338"><span class="btn btn-blue" onclick="submitPart('频谱搬移类算法的目的是将部分高频段频谱搬移至目标频段。与频谱压缩不同的是，原始频段所在频谱不会被压缩，只是转移或平移至目标区域。一般而言，由于频谱搬移算法中目标频段的最低频低于起始频率，故在搬移得到的频谱与剩余频谱叠加时会有一定的重叠，言语特征会发生改变。频谱搬移算法的输入频率与输出频率间对应关系如下图：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>340</span></div><div class="l"><span style="margin-left:25px"></span><span >图5-4频谱搬移频率对应关系 </span></div></div><div class="para"><div class="duanluo"><span>341</span></div><div class="l"><span style="margin-left:25px"></span><span >	频谱搬移过程中没有对原始频段进行压缩处理，所以被搬移部分频谱带宽没有改变，即f_oh-f_ol=f_th-f_tl； </span><span >且搬移的目的是将听损严重的高频段搬移至低频部分，所以对于频谱搬移而言一般存在f_ol&gt;f_tl，这也意味着搬移后频谱与未经任何处理的剩余部分存在重叠。 </span><span >常见频谱搬移类算法有线性频率转移（Linear Frequency Transposition, </span><span > LFT）和频率平移（Frequency translation/spectral envelope warping）算法。 </span></div><div class="modify" align="right" paraseq="340"><span class="btn btn-blue" onclick="submitPart('频谱搬移过程中没有对原始频段进行压缩处理，所以被搬移部分频谱带宽没有改变，即f_oh-f_ol=f_th-f_tl；且搬移的目的是将听损严重的高频段搬移至低频部分，所以对于频谱搬移而言一般存在f_ol&gt;f_tl，这也意味着搬移后频谱与未经任何处理的剩余部分存在重叠。常见频谱搬移类算法有线性频率转移（Linear Frequency Transposition,LFT）和频率平移（Frequency translation/spectral envelope warping）算法。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>342</span></div><div class="l"><span style="margin-left:25px"></span><span >	线性频率转移（LFT）技术将检测到的最重要的高频区频谱信息复制到1/2原始频率处，即降低一个倍频程。 </span><span >为了不过度影响低频信息的感知，原始频段不能太宽，只能选择部分信号进行搬移处理。 </span><span >同时，原始频段中最重要信息的检测规则影响着目标频段的确定，因此，最强峰检测规则也至关重要。 </span></div><div class="modify" align="right" paraseq="341"><span class="btn btn-blue" onclick="submitPart('线性频率转移（LFT）技术将检测到的最重要的高频区频谱信息复制到1/2原始频率处，即降低一个倍频程。为了不过度影响低频信息的感知，原始频段不能太宽，只能选择部分信号进行搬移处理。同时，原始频段中最重要信息的检测规则影响着目标频段的确定，因此，最强峰检测规则也至关重要。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>343</span></div><div class="l"><span style="margin-left:25px"></span><span >	频率平移技术原理与LFT技术类似，均是将部分高频信息移至低频。 </span><span >但是频率平移算法是一种自适应算法，它只在被处理的语音帧频谱中高频成分比重较大时才启动，依靠特征检测的方式监测输入频谱。 </span><span >检测到有比较明显的高频成分后，启动移频算法，将原始频段的高频特征复制到听力尚存的目标频段； </span><span >若算法未检测到突出的高频信息，则搬移算法不会启动。 </span></div><div class="modify" align="right" paraseq="342"><span class="btn btn-blue" onclick="submitPart('频率平移技术原理与LFT技术类似，均是将部分高频信息移至低频。但是频率平移算法是一种自适应算法，它只在被处理的语音帧频谱中高频成分比重较大时才启动，依靠特征检测的方式监测输入频谱。检测到有比较明显的高频成分后，启动移频算法，将原始频段的高频特征复制到听力尚存的目标频段；若算法未检测到突出的高频信息，则搬移算法不会启动。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>344</span></div><div class="l"><span style="margin-left:25px"></span><span >	移频助听小结 </span></div></div><div class="para"><div class="duanluo"><span>345</span></div><div class="l"><span style="margin-left:25px"></span><span >移频助听算法的核心思想是利用特定的对应法则将原始频段中的频谱搬移至目标频段，其目的是使输出信号尽可能的避开听障患者的严重听损区域， </span><span >以此为患者争取更多的识别率和语义理解能力的提升。 </span></div><div class="modify" align="right" paraseq="344"><span class="btn btn-blue" onclick="submitPart('移频助听算法的核心思想是利用特定的对应法则将原始频段中的频谱搬移至目标频段，其目的是使输出信号尽可能的避开听障患者的严重听损区域，以此为患者争取更多的识别率和语义理解能力的提升。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>346</span></div><div class="l"><span style="margin-left:25px"></span><span >传统移频助听算法针对主要针对高频听力损失严重的患者，通过对信号频谱进行压缩或者搬移实现。 </span><span >由于其目标人群听损发生在高频段，为了避开听损严重的区域算法需要将高频段信号移至中低频段，因此又被称为降频助听算法。 </span><span >频谱的变化给语音信号带来失真，佩戴者需要适应由信号频谱变化所带来的改变。 </span><span >作为重度听损患者所特需的，亦是为数不多的针对重度听损患者的助听算法，移频助听技术的研究具有重要意义。 </span><span >但是，目前而言，移频助听算法都只针对高频听损严重的情况，对于中低频的严重听损患者并没有给出类似的助听方案。 </span></div><div class="modify" align="right" paraseq="345"><span class="btn btn-blue" onclick="submitPart('传统移频助听算法针对主要针对高频听力损失严重的患者，通过对信号频谱进行压缩或者搬移实现。由于其目标人群听损发生在高频段，为了避开听损严重的区域算法需要将高频段信号移至中低频段，因此又被称为降频助听算法。频谱的变化给语音信号带来失真，佩戴者需要适应由信号频谱变化所带来的改变。作为重度听损患者所特需的，亦是为数不多的针对重度听损患者的助听算法，移频助听技术的研究具有重要意义。但是，目前而言，移频助听算法都只针对高频听损严重的情况，对于中低频的严重听损患者并没有给出类似的助听方案。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>347</span></div><div class="l"><span style="margin-left:25px"></span><span >	频率伸缩助听算法 </span></div></div><div class="para"><div class="duanluo"><span>348</span></div><div class="l"><span style="margin-left:25px"></span><span >在传统移频助听算法的基础上，本节针对其在特殊听损情况下的不足（类似V型严重听损）提出一种频率伸缩助听算法，使基于频谱的助听方案更全面。 </span></div><div class="modify" align="right" paraseq="347"><span class="btn btn-blue" onclick="submitPart('在传统移频助听算法的基础上，本节针对其在特殊听损情况下的不足（类似V型严重听损）提出一种频率伸缩助听算法，使基于频谱的助听方案更全面。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>349</span></div><div class="l"><span style="margin-left:25px"></span><span >5.2.1频率伸缩策略 </span></div></div><div class="para"><div class="duanluo"><span>350</span></div><div class="l"><span style="margin-left:25px"></span><span >传统移频助听算法的核心思想是通过语音信号的频谱处理将信号频率成分尽可能的避开听损严重的高频段。 </span><span >然而，此类处理方式并不能使听力图呈岛型、V型、翻转型等的严重听算患者受益，因为他们的听损严重频段并不是仅仅存在于高频段， </span><span >无法仅通过降频或是移频处理而使处理后的信号频谱避开听损严重的中频段甚至是低频段。 </span></div><div class="modify" align="right" paraseq="349"><span class="btn btn-blue" onclick="submitPart('传统移频助听算法的核心思想是通过语音信号的频谱处理将信号频率成分尽可能的避开听损严重的高频段。然而，此类处理方式并不能使听力图呈岛型、V型、翻转型等的严重听算患者受益，因为他们的听损严重频段并不是仅仅存在于高频段，无法仅通过降频或是移频处理而使处理后的信号频谱避开听损严重的中频段甚至是低频段。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>351</span></div><div class="l"><span style="margin-left:25px"></span><span >图5-5典型噪声性聋患者听力图 </span></div></div><div class="para"><div class="duanluo"><span>352</span></div><div class="l"><span style="margin-left:25px"></span><span >图是典型V型噪声性聋严重听损患者的听力图。 </span><span >该类患者的高频段听力情况相对较好，而在2000Hz至4000Hz的中高频段听损情况最为严重。 </span><span >如果采用传统的频谱压缩或是频谱搬移类算法，则信号压缩后频谱的整体动态范围将会大大缩小，过大的压缩比率将会导致信号可听度急剧下降， </span><span >使用者很难再通过训练而熟悉语音信号的这类改变。 </span></div><div class="modify" align="right" paraseq="351"><span class="btn btn-blue" onclick="submitPart('图是典型V型噪声性聋严重听损患者的听力图。该类患者的高频段听力情况相对较好，而在2000Hz至4000Hz的中高频段听损情况最为严重。如果采用传统的频谱压缩或是频谱搬移类算法，则信号压缩后频谱的整体动态范围将会大大缩小，过大的压缩比率将会导致信号可听度急剧下降，使用者很难再通过训练而熟悉语音信号的这类改变。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>353</span></div><div class="l"><span style="margin-left:25px"></span><span >鉴于类似的非高频段听损严重情况， </span><span >本文提出一种针对于某个频段的补偿策略：通过拉伸语音信号中听损最为严重的频段以提高患者对于该频段信号的感知， </span><span >并在采取拉伸处理频段的两端进行相应的压缩处理保证处理后的信号频谱不存在混叠。 </span><span >该算法的目标是使患者的剩余听力范围利用最大化，根据患者听力图的实际情况决定频谱伸缩处理的参数，使得处理后的语音信号频谱与患者剩余听力情况较好的吻合， </span><span >以此提高助听效果。 </span></div><div class="modify" align="right" paraseq="352"><span class="btn btn-blue" onclick="submitPart('鉴于类似的非高频段听损严重情况，本文提出一种针对于某个频段的补偿策略：通过拉伸语音信号中听损最为严重的频段以提高患者对于该频段信号的感知，并在采取拉伸处理频段的两端进行相应的压缩处理保证处理后的信号频谱不存在混叠。该算法的目标是使患者的剩余听力范围利用最大化，根据患者听力图的实际情况决定频谱伸缩处理的参数，使得处理后的语音信号频谱与患者剩余听力情况较好的吻合，以此提高助听效果。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>354</span></div><div class="l"><span style="margin-left:25px"></span><span >某V型听力图对应频谱伸缩策略的频率输入输出关系如下图所示（以信号采样频率为16KHz为例）： </span></div><div class="modify" align="right" paraseq="353"><span class="btn btn-blue" onclick="submitPart('某V型听力图对应频谱伸缩策略的频率输入输出关系如下图所示（以信号采样频率为16KHz为例）：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>355</span></div><div class="l"><span style="margin-left:25px"></span><span >图5-6频谱伸缩算法频率对应关系 </span></div></div><div class="para"><div class="duanluo"><span>356</span></div><div class="l"><span style="margin-left:25px"></span><span >	图中f_a类似于传统频谱压缩策略中的截止频率，在此频率之下患者听力情况仍然良好信号无需处理； </span><span >AB段类似于传统频谱压缩策略中需要进行压缩处理的频段，由压缩比参数控制压缩程度，患者在f_(a^' )至f_(b^' )频段内应处于轻中度听损， </span><span >保证频段[f_a,f_b ]内的信号压缩至[f_(a^' ),f_(b^' ) ]后能够理解大部分的言语信息； </span><span >BC频段[f_b,f_c ]是整个语音信号频段内听损最为严重的区域，通过拉伸处理使该频段内的信号扩散至附近频段[f_(b^' ), </span><span >f_(c^' ) ]，拉伸处理的目的在于尽量减少处理后语音信号在听损严重频段内的能量，同时也考虑到语音信号本身频谱的连贯性以及频谱间相对位置的关系， </span><span >在尽可能保证语音质量的情况下进行严重听损段的频谱扩散处理，试图增加处理后语音对于特定听力状况下的可听度和可懂度； </span><span >CD频段则与AB频段相类似，听损较为严重的[f_c,f_d ]段被压缩至听损较轻的[f_(c^' ),f_(d^' ) ]段，以增强[f_c, </span><span >f_d ]频段内信号的可听可懂度； </span><span >DE段则与起始频段[0,f_a ]类似，该频段所对应的听力状态良好，信号无需进行补偿处理。 </span></div><div class="modify" align="right" paraseq="355"><span class="btn btn-blue" onclick="submitPart('图中f_a类似于传统频谱压缩策略中的截止频率，在此频率之下患者听力情况仍然良好信号无需处理；AB段类似于传统频谱压缩策略中需要进行压缩处理的频段，由压缩比参数控制压缩程度，患者在f_(a^\' )至f_(b^\' )频段内应处于轻中度听损，保证频段[f_a,f_b ]内的信号压缩至[f_(a^\' ),f_(b^\' ) ]后能够理解大部分的言语信息；BC频段[f_b,f_c ]是整个语音信号频段内听损最为严重的区域，通过拉伸处理使该频段内的信号扩散至附近频段[f_(b^\' ),f_(c^\' ) ]，拉伸处理的目的在于尽量减少处理后语音信号在听损严重频段内的能量，同时也考虑到语音信号本身频谱的连贯性以及频谱间相对位置的关系，在尽可能保证语音质量的情况下进行严重听损段的频谱扩散处理，试图增加处理后语音对于特定听力状况下的可听度和可懂度；CD频段则与AB频段相类似，听损较为严重的[f_c,f_d ]段被压缩至听损较轻的[f_(c^\' ),f_(d^\' ) ]段，以增强[f_c,f_d ]频段内信号的可听可懂度；DE段则与起始频段[0,f_a ]类似，该频段所对应的听力状态良好，信号无需进行补偿处理。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>357</span></div><div class="l"><span style="margin-left:25px"></span><span >	根据上述原理性分析，总结得频谱伸缩原始信号频率与输出信号频率关系曲线确定过程如下： </span></div><div class="modify" align="right" paraseq="356"><span class="btn btn-blue" onclick="submitPart('根据上述原理性分析，总结得频谱伸缩原始信号频率与输出信号频率关系曲线确定过程如下：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>358</span></div><div class="l"><span style="margin-left:25px"></span><span >	确定听力损失最为严重的频段中心频率f，该参数可从听力图以及辅助频率分辨测试而得，该频点对应于听力图中听阈值最大的频段； </span></div><div class="modify" align="right" paraseq="357"><span class="btn btn-blue" onclick="submitPart('确定听力损失最为严重的频段中心频率f，该参数可从听力图以及辅助频率分辨测试而得，该频点对应于听力图中听阈值最大的频段；',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>359</span></div><div class="l"><span style="margin-left:25px"></span><span >	确定频点f附近的严重听损频段[f_b,f_c ]，该频段信号会被进行拉伸处理，一般可以通过听损患者在频点f处的频率辨别阈∆f得到f_b和f_c参数， </span><span >亦可从患者听力图折线情况间接推算出； </span></div><div class="modify" align="right" paraseq="358"><span class="btn btn-blue" onclick="submitPart('确定频点f附近的严重听损频段[f_b,f_c ]，该频段信号会被进行拉伸处理，一般可以通过听损患者在频点f处的频率辨别阈∆f得到f_b和f_c参数，亦可从患者听力图折线情况间接推算出；',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>360</span></div><div class="l"><span style="margin-left:25px"></span><span >	确定严重听损频段[f_b,f_c ]的拉伸系数&gamma;，&gamma;取值大小影响严重听损频段补偿效果，&gamma;值越大则补偿后信号严重听损频段内所剩能量越小， </span><span >但是拉伸后信号的失真更大，&gamma;取值小时信号失真小，但是针对严重听损频段的补偿小也随之下降； </span></div><div class="modify" align="right" paraseq="359"><span class="btn btn-blue" onclick="submitPart('确定严重听损频段[f_b,f_c ]的拉伸系数&gamma;，&gamma;取值大小影响严重听损频段补偿效果，&gamma;值越大则补偿后信号严重听损频段内所剩能量越小，但是拉伸后信号的失真更大，&gamma;取值小时信号失真小，但是针对严重听损频段的补偿小也随之下降；',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>361</span></div><div class="l"><span style="margin-left:25px"></span><span >	确定频率拉伸区域两边的频率压缩区域[f_a,f_b ]和[f_c,f_d ]， </span><span >频率压缩的起始频率f_a与终点频率f_d以及压缩后所对应的频点f_(a^' )和f_(d^' )可从听力图参数中确定， </span><span >两频段的压缩比分别记为&beta;_1和&beta;_2。 </span></div><div class="modify" align="right" paraseq="360"><span class="btn btn-blue" onclick="submitPart('确定频率拉伸区域两边的频率压缩区域[f_a,f_b ]和[f_c,f_d ]，频率压缩的起始频率f_a与终点频率f_d以及压缩后所对应的频点f_(a^\' )和f_(d^\' )可从听力图参数中确定，两频段的压缩比分别记为&beta;_1和&beta;_2。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>362</span></div><div class="l"><span style="margin-left:25px"></span><span >各个压缩段以及拉伸段参数详细确定策略后续章节将继续讨论。 </span><span >在原始信号与输出信号的频率转换关系图的参数确定之后即可对输入的数字化声信号进行非线性频率伸缩处理，具体步骤如下： </span></div><div class="modify" align="right" paraseq="361"><span class="btn btn-blue" onclick="submitPart('各个压缩段以及拉伸段参数详细确定策略后续章节将继续讨论。在原始信号与输出信号的频率转换关系图的参数确定之后即可对输入的数字化声信号进行非线性频率伸缩处理，具体步骤如下：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>363</span></div><div class="l"><span style="margin-left:25px"></span><span >	对数字助听器输入的数字化声音信号进行分帧，帧长N=2^E，E为正整数，一般地可取E=10，帧长N=1024，也即每帧信号具有1024采样点； </span></div><div class="modify" align="right" paraseq="362"><span class="btn btn-blue" onclick="submitPart('对数字助听器输入的数字化声音信号进行分帧，帧长N=2^E，E为正整数，一般地可取E=10，帧长N=1024，也即每帧信号具有1024采样点；',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>364</span></div><div class="l"><span style="margin-left:25px"></span><span >	对单帧信号进行快速傅里叶变换， </span><span >可得长度为N的初始频谱序列X=[■(x_0&amp;x_1&amp;■(⋯&amp;x_(N-1)]))； </span></div><div class="modify" align="right" paraseq="363"><span class="btn btn-blue" onclick="submitPart('对单帧信号进行快速傅里叶变换，可得长度为N的初始频谱序列X=[■(x_0&amp;x_1&amp;■(⋯&amp;x_(N-1)]))；',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>365</span></div><div class="l"><span style="margin-left:25px"></span><span >	计算频谱序列中频率f_b对应的点x_b的下标b=2N f_b/f_s ， </span><span >类似的计算频率点f_a、f_c和f_d所对应的频谱点x_a、x_c和x_d的下标值a=2N f_a/f_s 、c=2N f_c/f_s 和d=2N f_d/f_s ， </span><span >根据频谱的对称性，初始频谱X的[b,c]段和[N-b,N-c]段是拉伸段， [a,b]段、[c,d]段、[N-d,N-c]段和[N-b, </span><span >N-a]段是压缩段，其中f_s是数字声信号的采样频率； </span></div><div class="modify" align="right" paraseq="364"><span class="btn btn-blue" onclick="submitPart('计算频谱序列中频率f_b对应的点x_b的下标b=2N f_b/f_s ，类似的计算频率点f_a、f_c和f_d所对应的频谱点x_a、x_c和x_d的下标值a=2N f_a/f_s 、c=2N f_c/f_s 和d=2N f_d/f_s ，根据频谱的对称性，初始频谱X的[b,c]段和[N-b,N-c]段是拉伸段， [a,b]段、[c,d]段、[N-d,N-c]段和[N-b,N-a]段是压缩段，其中f_s是数字声信号的采样频率；',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>366</span></div><div class="l"><span style="margin-left:25px"></span><span >	计算频率伸缩后的谱序列M=[■(m_0&amp;m_1&amp;■(⋯&amp;m_(N-1)]))， </span><span >其中[■(m_(a^' )&amp;⋯&amp;m_(b^' ) )]段、[■(m_(c^' )&amp;⋯&amp;m_(d^' ) )]段和与之对应的[■(m_(N-b^' )&amp;⋯&amp;m_(〖N-a〗^' ) )]段、[■(m_(N-d^' )&amp;⋯&amp;m_(〖N-c〗^' ) )]段为频谱压缩后对应的谱序列， </span><span >[■(m_(b^' )&amp;⋯&amp;m_(c^' ) )]段和与之对应的[■(m_(N-c^' )&amp;⋯&amp;m_(〖N-b〗^' ) )]段为频谱拉伸后对应的谱序列， </span><span >原始频谱序列与伸缩后序列对应关系如图所示； </span></div><div class="modify" align="right" paraseq="365"><span class="btn btn-blue" onclick="submitPart('计算频率伸缩后的谱序列M=[■(m_0&amp;m_1&amp;■(⋯&amp;m_(N-1)]))，其中[■(m_(a^\' )&amp;⋯&amp;m_(b^\' ) )]段、[■(m_(c^\' )&amp;⋯&amp;m_(d^\' ) )]段和与之对应的[■(m_(N-b^\' )&amp;⋯&amp;m_(〖N-a〗^\' ) )]段、[■(m_(N-d^\' )&amp;⋯&amp;m_(〖N-c〗^\' ) )]段为频谱压缩后对应的谱序列，[■(m_(b^\' )&amp;⋯&amp;m_(c^\' ) )]段和与之对应的[■(m_(N-c^\' )&amp;⋯&amp;m_(〖N-b〗^\' ) )]段为频谱拉伸后对应的谱序列，原始频谱序列与伸缩后序列对应关系如图所示；',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>367</span></div><div class="l"><span style="margin-left:25px"></span><span >图5-7伸缩处理前后频谱序列对比 </span></div></div><div class="para"><div class="duanluo"><span>368</span></div><div class="l"><span style="margin-left:25px"></span><span >	计算频率伸缩后的谱序列M=[■(m_0&amp;m_1&amp;■(⋯&amp;m_(N-1)]))的拉伸段，拉伸中心频率f（见图5-6）保持不变，也即 </span></div><div class="modify" align="right" paraseq="367"><span class="btn btn-blue" onclick="submitPart('计算频率伸缩后的谱序列M=[■(m_0&amp;m_1&amp;■(⋯&amp;m_(N-1)]))的拉伸段，拉伸中心频率f（见图5-6）保持不变，也即',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>369</span></div><div class="l"><span style="margin-left:25px"></span><span >                          （5-2） </span></div></div><div class="para"><div class="duanluo"><span>370</span></div><div class="l"><span style="margin-left:25px"></span><span >根据拉伸系数的定义： </span></div></div><div class="para"><div class="duanluo"><span>371</span></div><div class="l"><span style="margin-left:25px"></span><span >                               （5-3） </span></div></div><div class="para"><div class="duanluo"><span>372</span></div><div class="l"><span style="margin-left:25px"></span><span >可计算得拉伸段起始频率点的下标： </span></div></div><div class="para"><div class="duanluo"><span>373</span></div><div class="l"><span style="margin-left:25px"></span><span >                         （5-4） </span></div></div><div class="para"><div class="duanluo"><span>374</span></div><div class="l"><span style="margin-left:25px"></span><span >同理可得拉伸段中止频点的下标： </span></div></div><div class="para"><div class="duanluo"><span>375</span></div><div class="l"><span style="margin-left:25px"></span><span >                        （5-5） </span></div></div><div class="para"><div class="duanluo"><span>376</span></div><div class="l"><span style="margin-left:25px"></span><span >在拉伸段频谱相应坐标确定后， </span><span >[■(m_(b^' )&amp;⋯&amp;m_(c^' ) )]段和[■(m_(N-c^' )&amp;⋯&amp;m_(〖N-b〗^' ) )]段的值可由[■(x_b&amp;⋯&amp;x_c )]和[■(x_(N-c)&amp;⋯&amp;x_(N-b) )]线性插值而得； </span></div><div class="modify" align="right" paraseq="375"><span class="btn btn-blue" onclick="submitPart('在拉伸段频谱相应坐标确定后，[■(m_(b^\' )&amp;⋯&amp;m_(c^\' ) )]段和[■(m_(N-c^\' )&amp;⋯&amp;m_(〖N-b〗^\' ) )]段的值可由[■(x_b&amp;⋯&amp;x_c )]和[■(x_(N-c)&amp;⋯&amp;x_(N-b) )]线性插值而得；',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>377</span></div><div class="l"><span style="margin-left:25px"></span><span >	继续计算频谱伸缩后的谱序列M=[■(m_0&amp;m_1&amp;■(⋯&amp;m_(N-1)]))的压缩段， </span><span >压缩后的[■(m_(a^' )&amp;⋯&amp;m_(b^' ) )]段可由压缩前所对应的原始频段[■(x_a&amp;⋯&amp;x_b )]均匀抽样而得，压缩前后信号满足 ， </span><span >同理[■(m_(c^' )&amp;⋯&amp;m_(d^' ) )]段可由[■(x_c&amp;⋯&amp;x_d )]均匀抽样得到，压缩前后信号满足 ， </span><span >继而频谱对称部分的[■(m_(N-d^' )&amp;⋯&amp;m_(〖N-c〗^' ) )]段和[■(m_(N-b^' )&amp;⋯&amp;m_(〖N-a〗^' ) )]段亦可由[■(x_(N-d)&amp;⋯&amp;x_(N-c) )]段和[■(x_(N-b)&amp;⋯&amp;x_(N-a) )]抽样而得。 </span></div><div class="modify" align="right" paraseq="376"><span class="btn btn-blue" onclick="submitPart('继续计算频谱伸缩后的谱序列M=[■(m_0&amp;m_1&amp;■(⋯&amp;m_(N-1)]))的压缩段，压缩后的[■(m_(a^\' )&amp;⋯&amp;m_(b^\' ) )]段可由压缩前所对应的原始频段[■(x_a&amp;⋯&amp;x_b )]均匀抽样而得，压缩前后信号满足 ，同理[■(m_(c^\' )&amp;⋯&amp;m_(d^\' ) )]段可由[■(x_c&amp;⋯&amp;x_d )]均匀抽样得到，压缩前后信号满足 ，继而频谱对称部分的[■(m_(N-d^\' )&amp;⋯&amp;m_(〖N-c〗^\' ) )]段和[■(m_(N-b^\' )&amp;⋯&amp;m_(〖N-a〗^\' ) )]段亦可由[■(x_(N-d)&amp;⋯&amp;x_(N-c) )]段和[■(x_(N-b)&amp;⋯&amp;x_(N-a) )]抽样而得。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>378</span></div><div class="l"><span style="margin-left:25px"></span><span >	继续计算频谱伸缩后的谱序列M=[■(m_0&amp;m_1&amp;■(⋯&amp;m_(N-1)]))的剩余段，其中处理前后频谱下标a^'=a,d^'=d， </span><span >也即处理后频谱的[■(m_0&amp;⋯&amp;m_(a^' ) )]段与原始频谱的[■(x_0&amp;⋯&amp;x_a )]相同， </span><span >[■(m_(d^' )&amp;⋯&amp;m_(〖N-d〗^' ) )]段与[■(x_d&amp;⋯&amp;x_(N-d) )]段相同， </span><span >[■(m_(〖N-a〗^' )&amp;⋯&amp;m_(N-1) )]段与[■(x_(N-a)&amp;⋯&amp;x_(N-1) )]段相同，至此频谱伸缩后谱序列M计算完成。 </span></div><div class="modify" align="right" paraseq="377"><span class="btn btn-blue" onclick="submitPart('继续计算频谱伸缩后的谱序列M=[■(m_0&amp;m_1&amp;■(⋯&amp;m_(N-1)]))的剩余段，其中处理前后频谱下标a^\'=a,d^\'=d，也即处理后频谱的[■(m_0&amp;⋯&amp;m_(a^\' ) )]段与原始频谱的[■(x_0&amp;⋯&amp;x_a )]相同，[■(m_(d^\' )&amp;⋯&amp;m_(〖N-d〗^\' ) )]段与[■(x_d&amp;⋯&amp;x_(N-d) )]段相同，[■(m_(〖N-a〗^\' )&amp;⋯&amp;m_(N-1) )]段与[■(x_(N-a)&amp;⋯&amp;x_(N-1) )]段相同，至此频谱伸缩后谱序列M计算完成。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>379</span></div><div class="l"><span style="margin-left:25px"></span><span >本节以一典型&quot;V&rdquo;型听力图患者频谱伸缩处理为例介绍频谱伸缩算法中频谱伸缩策略以及其具体计算方法，为后续分析建立基础。 </span></div><div class="modify" align="right" paraseq="378"><span class="btn btn-blue" onclick="submitPart('本节以一典型&quot;V&rdquo;型听力图患者频谱伸缩处理为例介绍频谱伸缩算法中频谱伸缩策略以及其具体计算方法，为后续分析建立基础。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>380</span></div><div class="l"><span style="margin-left:25px"></span><span >5.2.2频谱伸缩算法参数选择 </span></div></div><div class="para"><div class="duanluo"><span>381</span></div><div class="l"><span style="margin-left:25px"></span><span >	由上节频谱伸缩算法原理介绍可知，该算法所需要确定的参数包括补偿前的频率点f_a,f_b,f_c和f_d以及补偿后频率点f_(a^' ), </span><span >f_(b^' ),f_(c^' )和f_(d^' )。 </span><span >同时，频谱伸缩算法是一种频率补偿算法，只有听力损失较为严重的听损患者需要借助频率补偿类算法以获取更好的助听效果，因此， </span><span >算法启用条件也是算法参数选择之一。 </span><span >这些参数均需从患者听力图中获取。 </span></div><div class="modify" align="right" paraseq="380"><span class="btn btn-blue" onclick="submitPart('由上节频谱伸缩算法原理介绍可知，该算法所需要确定的参数包括补偿前的频率点f_a,f_b,f_c和f_d以及补偿后频率点f_(a^\' ),f_(b^\' ),f_(c^\' )和f_(d^\' )。同时，频谱伸缩算法是一种频率补偿算法，只有听力损失较为严重的听损患者需要借助频率补偿类算法以获取更好的助听效果，因此，算法启用条件也是算法参数选择之一。这些参数均需从患者听力图中获取。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>382</span></div><div class="l"><span style="margin-left:25px"></span><span >	首先是算法启动条件参数确定，也即何种听力情况下需使用此频谱伸缩算法。 </span><span >遵循频率补偿类算法的初衷，其所针对的用户是中重度听损患者，因此，通过听力图确定该患者的听力损失情况是否属于较重度患者即可。 </span><span >根据第二章中WHO听力损伤定级方案，本文选取70dB HL作为患者听损情况分界点，即当患者的听力损失情况达到中重度损失及以上时，频率补偿算法启用。 </span></div><div class="modify" align="right" paraseq="381"><span class="btn btn-blue" onclick="submitPart('首先是算法启动条件参数确定，也即何种听力情况下需使用此频谱伸缩算法。遵循频率补偿类算法的初衷，其所针对的用户是中重度听损患者，因此，通过听力图确定该患者的听力损失情况是否属于较重度患者即可。根据第二章中WHO听力损伤定级方案，本文选取70dB HL作为患者听损情况分界点，即当患者的听力损失情况达到中重度损失及以上时，频率补偿算法启用。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>383</span></div><div class="l"><span style="margin-left:25px"></span><span >	其次，算法需要确定补偿前频谱上各压缩段和拉伸段频点参数f_a,f_b,f_c和f_d。 </span><span >根据算法原理可知，频段〖[0,f〗_a]及〖[f〗_d,f_s/2]属于听力状况良好的频段，参考WHO听力损伤定级标准， </span><span >选取中度听损起始声压级（40dB HL）作为参考线，划定频点f_a和f_d。 </span><span >当患者的高频听损均较为严重时，即高频段不存在听力状况良好的频段，则算法中〖[f〗_d,f_s/2]段退化，图5-8所示即无高频听损良好段， </span><span >故f_d取为f_s/2。 </span><span >拉伸段起始频率f_b以及拉伸段终止频率f_c则由中重度听损判定标准线（70dB HL）确定，如图5-8所示。 </span><span >同理，当听障患者的高频听力能力呈单调下降趋势（听力图无&quot;V&rdquo;型）时，拉伸段终止频率f_c退化，此时， </span><span >可以判断患者在听阈70dB HL所对应频率至最高频（f_s/2）的频段内听力情况损失均较为严重，不存在听力损失较轻微的频段〖[f〗_c,f_d]， </span><span >因此，此时对听损较为严重的频段进行拉伸处理的收效甚微。 </span><span >面对此种听力情况，算法将第一压缩段的截止频率延伸至最高频，算法退化为普通的频率压缩类算法，与已有算法吻合。 </span></div><div class="modify" align="right" paraseq="382"><span class="btn btn-blue" onclick="submitPart('其次，算法需要确定补偿前频谱上各压缩段和拉伸段频点参数f_a,f_b,f_c和f_d。根据算法原理可知，频段〖[0,f〗_a]及〖[f〗_d,f_s/2]属于听力状况良好的频段，参考WHO听力损伤定级标准，选取中度听损起始声压级（40dB HL）作为参考线，划定频点f_a和f_d。当患者的高频听损均较为严重时，即高频段不存在听力状况良好的频段，则算法中〖[f〗_d,f_s/2]段退化，图5-8所示即无高频听损良好段，故f_d取为f_s/2。拉伸段起始频率f_b以及拉伸段终止频率f_c则由中重度听损判定标准线（70dB HL）确定，如图5-8所示。同理，当听障患者的高频听力能力呈单调下降趋势（听力图无&quot;V&rdquo;型）时，拉伸段终止频率f_c退化，此时，可以判断患者在听阈70dB HL所对应频率至最高频（f_s/2）的频段内听力情况损失均较为严重，不存在听力损失较轻微的频段〖[f〗_c,f_d]，因此，此时对听损较为严重的频段进行拉伸处理的收效甚微。面对此种听力情况，算法将第一压缩段的截止频率延伸至最高频，算法退化为普通的频率压缩类算法，与已有算法吻合。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>384</span></div><div class="l"><span style="margin-left:25px"></span><span >图5-8补偿前频谱各频点参数划定 </span></div></div><div class="para"><div class="duanluo"><span>385</span></div><div class="l"><span style="margin-left:25px"></span><span >	最后确定补偿后频谱各频率节点参数。 </span><span >由算法原理描述可知补偿后第一压缩段起始频率f_(a^' )与补偿前第一压缩段起始频率f_a相同； </span><span >补偿后第二压缩段终止频率f_(d^' )与补偿前第二压缩段终止频率f_d相同。 </span><span >因此需要单独确定的参数为补偿后拉伸段起始频率f_(b^' )和终止频率f_(c^' )。 </span><span >频点f_(b^' )和f_(c^' )的值决定着听损严重段〖[f〗_b,f_c]拉伸后所对应的频段。 </span><span >用V_a表示听力状态良好划分点（本文取40dB HL），V_b表示听力损失中重度划分点（本文取70dB HL）， </span><span >并用H_max表示听损最大值（如图中即为85dB HL），用V_m表示补偿后拉伸段频点参数划分点。 </span><span >则V_m可用如下公式算得： </span></div><div class="modify" align="right" paraseq="384"><span class="btn btn-blue" onclick="submitPart('最后确定补偿后频谱各频率节点参数。由算法原理描述可知补偿后第一压缩段起始频率f_(a^\' )与补偿前第一压缩段起始频率f_a相同；补偿后第二压缩段终止频率f_(d^\' )与补偿前第二压缩段终止频率f_d相同。因此需要单独确定的参数为补偿后拉伸段起始频率f_(b^\' )和终止频率f_(c^\' )。频点f_(b^\' )和f_(c^\' )的值决定着听损严重段〖[f〗_b,f_c]拉伸后所对应的频段。用V_a表示听力状态良好划分点（本文取40dB HL），V_b表示听力损失中重度划分点（本文取70dB HL），并用H_max表示听损最大值（如图中即为85dB HL），用V_m表示补偿后拉伸段频点参数划分点。则V_m可用如下公式算得：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>386</span></div><div class="l"><span style="margin-left:25px"></span><span >                    （5-6） </span></div></div><div class="para"><div class="duanluo"><span>387</span></div><div class="l"><span style="margin-left:25px"></span><span >从参数V_m的计算过程可以看出，其值取决于患者的听损最大值H_max和重度听损划分界限V_b， </span><span >同时其值不会小于听力状态良好划分点V_a和听力损失中重度划分点V_b的均值。 </span><span >参数V_m值将作为拉伸段〖[f〗_b,f_c]拉伸处理后的拉伸段参数f_(b^' )和f_(c^' )的划定标准，因此该参数决定算法的拉伸度和压缩比。 </span><span >听损最大值H_max越大，则拉伸比和压缩比越大； </span><span >同理，当听损最大值H_max与重度听损划分界限V_b所差无几时，V_m值和将和V_b相近， </span><span >此时由V_m确定的频点f_(b^' )和f_(c^' )的值和补偿前相应的频点值f_b和f_c相近，也即压缩比和拉伸比将接近1。 </span><span >此机制与听力图状态分布和理论上补偿方案吻合。 </span></div><div class="modify" align="right" paraseq="386"><span class="btn btn-blue" onclick="submitPart('从参数V_m的计算过程可以看出，其值取决于患者的听损最大值H_max和重度听损划分界限V_b，同时其值不会小于听力状态良好划分点V_a和听力损失中重度划分点V_b的均值。参数V_m值将作为拉伸段〖[f〗_b,f_c]拉伸处理后的拉伸段参数f_(b^\' )和f_(c^\' )的划定标准，因此该参数决定算法的拉伸度和压缩比。听损最大值H_max越大，则拉伸比和压缩比越大；同理，当听损最大值H_max与重度听损划分界限V_b所差无几时，V_m值和将和V_b相近，此时由V_m确定的频点f_(b^\' )和f_(c^\' )的值和补偿前相应的频点值f_b和f_c相近，也即压缩比和拉伸比将接近1。此机制与听力图状态分布和理论上补偿方案吻合。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>388</span></div><div class="l"><span style="margin-left:25px"></span><span >由V_m参数值确定频点f_(b^' )和f_(c^' )的值方法与其他节点频点值确定方法一致，如图5-9所示： </span></div><div class="modify" align="right" paraseq="387"><span class="btn btn-blue" onclick="submitPart('由V_m参数值确定频点f_(b^\' )和f_(c^\' )的值方法与其他节点频点值确定方法一致，如图5-9所示：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>389</span></div><div class="l"><span style="margin-left:25px"></span><span >图5-9伸缩后对应频点划定 </span></div></div><div class="para"><div class="duanluo"><span>390</span></div><div class="l"><span style="margin-left:25px"></span><span >	至此，算法中个节点频率参数均已确定， </span><span >在节点频率参数确定之后便可得到频率伸缩补偿方案的核心数据——补偿前后频率对应关系。 </span><span >在以上各算法参数确定方案介绍中有提到几类边缘型问题，即当用户的听力图有所变化时，补偿前后频率的对应关系也会有所变化。 </span><span >因此下文将对几类相关的听力图类型及相应的频率对应关系进行介绍。 </span></div><div class="modify" align="right" paraseq="389"><span class="btn btn-blue" onclick="submitPart('至此，算法中个节点频率参数均已确定，在节点频率参数确定之后便可得到频率伸缩补偿方案的核心数据——补偿前后频率对应关系。在以上各算法参数确定方案介绍中有提到几类边缘型问题，即当用户的听力图有所变化时，补偿前后频率的对应关系也会有所变化。因此下文将对几类相关的听力图类型及相应的频率对应关系进行介绍。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>391</span></div><div class="l"><span style="margin-left:25px"></span><span >	高频听损良好（听力图呈&quot;V&rdquo;型） </span></div></div><div class="para"><div class="duanluo"><span>392</span></div><div class="l"><span style="margin-left:25px"></span><span >此类听损患者最高频听力情况保存良好，听损区域发生在中频段，且听力损失严重，典型听力图及相应的频率对应关系如下： </span></div><div class="modify" align="right" paraseq="391"><span class="btn btn-blue" onclick="submitPart('此类听损患者最高频听力情况保存良好，听损区域发生在中频段，且听力损失严重，典型听力图及相应的频率对应关系如下：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>393</span></div><div class="l"><span style="margin-left:25px"></span><span >图5-10 V型听力图及相应频率对应关系 </span></div></div><div class="para"><div class="duanluo"><span>394</span></div><div class="l"><span style="margin-left:25px"></span><span >	高频听损中度（听力图呈半&quot;V&rdquo;型） </span></div></div><div class="para"><div class="duanluo"><span>395</span></div><div class="l"><span style="margin-left:25px"></span><span >此类患者高频听力损失较为严重，高频段不存在听损良好段，而且由于高频听损严重，在听力图上无法得到补偿后压缩段的截止频率f_(c^' )。 </span><span >面对此种情况，算法将f_(c^' )值取为补偿前压缩段的截止频率f_c，如此则第二压缩段退化， </span><span >而拉伸处理则会将拉伸段全部向低频段（由f_b至f_(b^' )）拉伸，因为患者在第二压缩段所在频段的听力状况并不良好，而低频段听损保存较好， </span><span >这样处理更有助于对听力完好区的利用。 </span><span >示例听力图及相应的频率对应关系如下： </span></div><div class="modify" align="right" paraseq="394"><span class="btn btn-blue" onclick="submitPart('此类患者高频听力损失较为严重，高频段不存在听损良好段，而且由于高频听损严重，在听力图上无法得到补偿后压缩段的截止频率f_(c^\' )。面对此种情况，算法将f_(c^\' )值取为补偿前压缩段的截止频率f_c，如此则第二压缩段退化，而拉伸处理则会将拉伸段全部向低频段（由f_b至f_(b^\' )）拉伸，因为患者在第二压缩段所在频段的听力状况并不良好，而低频段听损保存较好，这样处理更有助于对听力完好区的利用。示例听力图及相应的频率对应关系如下：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>396</span></div><div class="l"><span style="margin-left:25px"></span><span >图5-11半V型听力图及频率对应关系 </span></div></div><div class="para"><div class="duanluo"><span>397</span></div><div class="l"><span style="margin-left:25px"></span><span >	高频听损重度（直降型听力图） </span></div></div><div class="para"><div class="duanluo"><span>398</span></div><div class="l"><span style="margin-left:25px"></span><span >此类听损患者的听损情况随着频率上升而越发严重，根据算法参数确定方案，补偿前拉伸段截止频率f_c亦将无法得到，此类听力图表明患者高频段听损严重， </span><span >补偿处理时，无法利用高频段的听力能力。 </span><span >因此，算法在面对此类听力图时，仅采用第一压缩段，并以其压缩比作为参考，将f_b以上频段信号全部压缩，此种处理方式与传统的频谱压缩补偿策略类似。 </span><span >示例听力图及相应的频率对应关系如下： </span></div><div class="modify" align="right" paraseq="397"><span class="btn btn-blue" onclick="submitPart('此类听损患者的听损情况随着频率上升而越发严重，根据算法参数确定方案，补偿前拉伸段截止频率f_c亦将无法得到，此类听力图表明患者高频段听损严重，补偿处理时，无法利用高频段的听力能力。因此，算法在面对此类听力图时，仅采用第一压缩段，并以其压缩比作为参考，将f_b以上频段信号全部压缩，此种处理方式与传统的频谱压缩补偿策略类似。示例听力图及相应的频率对应关系如下：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>399</span></div><div class="l"><span style="margin-left:25px"></span><span >图5-12直降性听力图及频率对应关系 </span></div></div><div class="para"><div class="duanluo"><span>400</span></div><div class="l"><span style="margin-left:25px"></span><span >5.2.3频谱伸缩算法小结 </span></div></div><div class="para"><div class="duanluo"><span>401</span></div><div class="l"><span style="margin-left:25px"></span><span >	频谱伸缩算法作为频率频率补偿类助听算法之一，其所面向的对象亦是听损较为严重、传统响度补偿类助听方案效果不佳的患者。 </span><span >传统的频率补偿类算法主要包括频谱压缩类和频谱搬移类，专注于高频听损严重的听障患者，而对于次高频段、中频段听损严重的患者，此类助听方案并不合适。 </span><span >频谱伸缩算法正是针对传统的频率补偿策略的此类不足而提出的一种新的频率补偿策略。 </span><span >该算法以患者的听力图作为基础依据，结合频谱压缩和拉伸处理，生成相应的频谱补偿处理方案。 </span></div><div class="modify" align="right" paraseq="400"><span class="btn btn-blue" onclick="submitPart('频谱伸缩算法作为频率频率补偿类助听算法之一，其所面向的对象亦是听损较为严重、传统响度补偿类助听方案效果不佳的患者。传统的频率补偿类算法主要包括频谱压缩类和频谱搬移类，专注于高频听损严重的听障患者，而对于次高频段、中频段听损严重的患者，此类助听方案并不合适。频谱伸缩算法正是针对传统的频率补偿策略的此类不足而提出的一种新的频率补偿策略。该算法以患者的听力图作为基础依据，结合频谱压缩和拉伸处理，生成相应的频谱补偿处理方案。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>402</span></div><div class="l"><span style="margin-left:25px"></span><span >	频谱伸缩算法首先以完整V型听力图患者作为目标对象，从其听力图得出各个算法参数，从而确定补偿前后的频谱对应关系。 </span><span >然而对于不同类的听力损失患者所需的频率补偿策略大相径庭，因此算法对听力图类型进行较为细致的划分。 </span><span >对于听损并没有特别严重的患者，无需采用频率补偿类算法，该类算法会改变语音频谱结构使其听起来有失真感，强行开启频率补偿类算法可能会适得其反，因此， </span><span >算法的开启条件设定很有必要。 </span><span >同时，参数确定方案并不能完美匹配所有类型的听力图，因此，针对不同类型的听力图，参数确定算法需要进行相应的适配以达到较好的补偿效果。 </span><span >参数确定和频谱关系的适配均遵循患者剩余听损最大化的原则。 </span><span >算法通过听力图的不同而进行参数和策略调整，使得其在合理应对V型听力图的基础上也能兼顾最高频听损严重的其他类患者，增加了算法的适应性。 </span></div><div class="modify" align="right" paraseq="401"><span class="btn btn-blue" onclick="submitPart('频谱伸缩算法首先以完整V型听力图患者作为目标对象，从其听力图得出各个算法参数，从而确定补偿前后的频谱对应关系。然而对于不同类的听力损失患者所需的频率补偿策略大相径庭，因此算法对听力图类型进行较为细致的划分。对于听损并没有特别严重的患者，无需采用频率补偿类算法，该类算法会改变语音频谱结构使其听起来有失真感，强行开启频率补偿类算法可能会适得其反，因此，算法的开启条件设定很有必要。同时，参数确定方案并不能完美匹配所有类型的听力图，因此，针对不同类型的听力图，参数确定算法需要进行相应的适配以达到较好的补偿效果。参数确定和频谱关系的适配均遵循患者剩余听损最大化的原则。算法通过听力图的不同而进行参数和策略调整，使得其在合理应对V型听力图的基础上也能兼顾最高频听损严重的其他类患者，增加了算法的适应性。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>403</span></div><div class="l"><span style="margin-left:25px"></span><span >	本节主要介绍频谱伸缩算法基础理论和相关的参数选择策略以及面对各种不同类型听力图时算法的应对方式，后文将继续分析算法的补偿效果。 </span></div><div class="modify" align="right" paraseq="402"><span class="btn btn-blue" onclick="submitPart('本节主要介绍频谱伸缩算法基础理论和相关的参数选择策略以及面对各种不同类型听力图时算法的应对方式，后文将继续分析算法的补偿效果。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>404</span></div><div class="l"><span style="margin-left:25px"></span><span >	频率补偿实验 </span></div></div><div class="para"><div class="duanluo"><span>405</span></div><div class="l"><span style="margin-left:25px"></span><span >本节介绍以频率伸缩算法为处理方案的频率补偿实验。 </span><span >以一&quot;V&rdquo;型听力图的中重度听损患者为例，以TIMIT语料库的某段语音为补偿对象，展示算法各参数的计算以及最终的补偿效果。 </span></div><div class="modify" align="right" paraseq="404"><span class="btn btn-blue" onclick="submitPart('本节介绍以频率伸缩算法为处理方案的频率补偿实验。以一&quot;V&rdquo;型听力图的中重度听损患者为例，以TIMIT语料库的某段语音为补偿对象，展示算法各参数的计算以及最终的补偿效果。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>406</span></div><div class="l"><span style="margin-left:25px"></span><span >5.3.1 语料库介绍 </span></div></div><div class="para"><div class="duanluo"><span>407</span></div><div class="l"><span style="margin-left:25px"></span><span >	实验所选取语料来自TIMIT语料库。 </span><span >TIMIT的全称是The DARPA TIMIT Acoustic-Phonetic Continuous Speech Corpus, </span><a href="../sentence_detail/978.htm" target="right" class="red">该语料库由德州仪器（TI）、麻省理工学院（MIT）和斯坦福研究院（SRI）共同研制构建[61]。</a><span >语料由德州仪器（TI）录制，在MIT进行转录和后期处理，并由美国国家标准技术研究所（NIST）验证和刻录为CD-ROM。 </span><span >语料库建立的初衷是为了给语音音素学习学者以及语音识别系统的发展和评估提供语料。 </span><span >TIMIT语料库的录制包含了630名说话者以及全美的8大英语方言，每位参与录音着所朗读语句音节信息丰富。 </span><span >语料库中的语音均经过时间对齐正交处理，每段语音文件采用16KHz的采样率，16位编码处理。 </span></div><div class="modify" align="right" paraseq="406"><span class="btn btn-blue" onclick="submitPart('实验所选取语料来自TIMIT语料库。TIMIT的全称是The DARPA TIMIT Acoustic-Phonetic Continuous Speech Corpus,该语料库由德州仪器（TI）、麻省理工学院（MIT）和斯坦福研究院（SRI）共同研制构建[61]。语料由德州仪器（TI）录制，在MIT进行转录和后期处理，并由美国国家标准技术研究所（NIST）验证和刻录为CD-ROM。语料库建立的初衷是为了给语音音素学习学者以及语音识别系统的发展和评估提供语料。TIMIT语料库的录制包含了630名说话者以及全美的8大英语方言，每位参与录音着所朗读语句音节信息丰富。语料库中的语音均经过时间对齐正交处理，每段语音文件采用16KHz的采样率，16位编码处理。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>408</span></div><div class="l"><span style="margin-left:25px"></span><span >	TIMIT语料库应用广泛，相对而言公正客观。 </span><span >虽然本文不涉及语音识别等相关技术，但是为了试验的客观性，选取公认语料库的语音段作为实验数据依然有必要。 </span><span >因此，本章后续实验以TIMIT语料库中dr1组mjsw0目录下&quot;sa2. </span><span >wav&rdquo;语料作为实验语料。 </span></div><div class="modify" align="right" paraseq="407"><span class="btn btn-blue" onclick="submitPart('TIMIT语料库应用广泛，相对而言公正客观。虽然本文不涉及语音识别等相关技术，但是为了试验的客观性，选取公认语料库的语音段作为实验数据依然有必要。因此，本章后续实验以TIMIT语料库中dr1组mjsw0目录下&quot;sa2.wav&rdquo;语料作为实验语料。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>409</span></div><div class="l"><span style="margin-left:25px"></span><span >5.3.2 频率补偿实验 </span></div></div><div class="para"><div class="duanluo"><span>410</span></div><div class="l"><span style="margin-left:25px"></span><span >	本节实验以一噪声性聋中重度耳聋患者为例，其听力损失严重区域主要在2KHz至5KHz的中高频段，其听力图状况如下图所示： </span></div><div class="modify" align="right" paraseq="409"><span class="btn btn-blue" onclick="submitPart('本节实验以一噪声性聋中重度耳聋患者为例，其听力损失严重区域主要在2KHz至5KHz的中高频段，其听力图状况如下图所示：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>411</span></div><div class="l"><span style="margin-left:25px"></span><span >图5-13示例患者听力图及频率对应关系 </span></div></div><div class="para"><div class="duanluo"><span>412</span></div><div class="l"><span style="margin-left:25px"></span><span >	从图5-13大致可以看出患者的严重听损段在2KHz之后的中高频段，在5KHz左右之后的最高频段听力情况稍有好转，属于5.2.2节中的第二种情形。 </span><span >从听力图可以看到，患者的最严重听损值H_max与V_b相差无几，因此V_m值亦与V_b相近， </span><span >这便使得患者的频谱输入输出关系中压缩段和拉伸段的系数均接近于1，这也是频率补偿策略的初衷所导致的。 </span><span >只有当患者的听损情况非常糟糕时其压缩或拉伸处理力度才会较大，因为对频谱的拉伸和压缩必然会导致语音的可听度受到影响。 </span></div><div class="modify" align="right" paraseq="411"><span class="btn btn-blue" onclick="submitPart('从图5-13大致可以看出患者的严重听损段在2KHz之后的中高频段，在5KHz左右之后的最高频段听力情况稍有好转，属于5.2.2节中的第二种情形。从听力图可以看到，患者的最严重听损值H_max与V_b相差无几，因此V_m值亦与V_b相近，这便使得患者的频谱输入输出关系中压缩段和拉伸段的系数均接近于1，这也是频率补偿策略的初衷所导致的。只有当患者的听损情况非常糟糕时其压缩或拉伸处理力度才会较大，因为对频谱的拉伸和压缩必然会导致语音的可听度受到影响。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>413</span></div><div class="l"><span style="margin-left:25px"></span><span >	经过算法参数计算程序处理，得到各算法参数值如下： </span></div></div><div class="para"><div class="duanluo"><span>414</span></div><div class="l"><span style="margin-left:25px"></span><span >将参数值导入频谱关系生成程序，并利用所得补偿前后频谱对应关系处理样例语料&lsquo;sa2. </span><span >wav&rsquo;,最终补偿结果如下所示： </span></div><div class="modify" align="right" paraseq="413"><span class="btn btn-blue" onclick="submitPart('将参数值导入频谱关系生成程序，并利用所得补偿前后频谱对应关系处理样例语料&lsquo;sa2.wav&rsquo;,最终补偿结果如下所示：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>415</span></div><div class="l"><span style="margin-left:25px"></span><span >图5-14补偿前后语音信号时域及频域对比（半V型） </span></div></div><div class="para"><div class="duanluo"><span>416</span></div><div class="l"><span style="margin-left:25px"></span><span >补偿结果的频谱变化从图中的补偿前后频谱对应关系便可预知，图中语谱图对比使得频谱处理更为直观。 </span><span >因为此例患者听损情况基本刚出于启用频率补偿的边缘，相对于听损特别严重的患者而言，其听损情况比较良好，所以其相应的应对方案对频谱的处理变化比较轻微。 </span><span >通过这种轻微的频谱处理可以使该患者对其听损严重段（2KHz-5KHz）内的语音信号的聆听和理解有些帮助， </span><span >同时频谱拉伸后所造成的轻微压缩也不影响其他频段信号的正常理解。 </span></div><div class="modify" align="right" paraseq="415"><span class="btn btn-blue" onclick="submitPart('补偿结果的频谱变化从图中的补偿前后频谱对应关系便可预知，图中语谱图对比使得频谱处理更为直观。因为此例患者听损情况基本刚出于启用频率补偿的边缘，相对于听损特别严重的患者而言，其听损情况比较良好，所以其相应的应对方案对频谱的处理变化比较轻微。通过这种轻微的频谱处理可以使该患者对其听损严重段（2KHz-5KHz）内的语音信号的聆听和理解有些帮助，同时频谱拉伸后所造成的轻微压缩也不影响其他频段信号的正常理解。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>417</span></div><div class="l"><span style="margin-left:25px"></span><span >在面对听损更为严重的患者时，算法所给出的频率补偿方案对最终输出语音的影响也将更为明显。 </span><span >以重度高频听损患者为例（5.2.2节，第三类），该类患者整个高频段的听损均比较严重，且随着频率上升，听力状况愈发下降。 </span><span >针对此类患者，本算法给出的频率补偿方案与传统频谱压缩类补偿方案类似，5.2.2节中已进行分析。 </span><span >选取5.2.2节中第三类患者的示例听力图及频谱对应关系为例，对实验语料段&lsquo;sa2. </span><span >wav&rsquo;进行补偿处理。选取图5-12中听力图为例计算算法各参数如下： </span></div><div class="modify" align="right" paraseq="416"><span class="btn btn-blue" onclick="submitPart('在面对听损更为严重的患者时，算法所给出的频率补偿方案对最终输出语音的影响也将更为明显。以重度高频听损患者为例（5.2.2节，第三类），该类患者整个高频段的听损均比较严重，且随着频率上升，听力状况愈发下降。针对此类患者，本算法给出的频率补偿方案与传统频谱压缩类补偿方案类似，5.2.2节中已进行分析。选取5.2.2节中第三类患者的示例听力图及频谱对应关系为例，对实验语料段&lsquo;sa2.wav&rsquo;进行补偿处理。选取图5-12中听力图为例计算算法各参数如下：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>418</span></div><div class="l"><span style="margin-left:25px"></span><span >根据听力图类型确定算法补偿方案类型，并以上所得算法参数为基础得到频谱对应关系，最终对实验语音段&rsquo;sa2. </span><span >wav&rsquo;进行补偿，结果如下： </span></div><div class="modify" align="right" paraseq="417"><span class="btn btn-blue" onclick="submitPart('根据听力图类型确定算法补偿方案类型，并以上所得算法参数为基础得到频谱对应关系，最终对实验语音段&rsquo;sa2.wav&rsquo;进行补偿，结果如下：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>419</span></div><div class="l"><span style="margin-left:25px"></span><span >图5-15补偿前后语音信号时域及频域对比（直降型） </span></div></div><div class="para"><div class="duanluo"><span>420</span></div><div class="l"><span style="margin-left:25px"></span><span >	从频谱对应关系和最终的语谱图对比可以看出：频段0-900Hz段信号保持不变，频段900-8000Hz内的信号被压缩至900-5980Hz。 </span><span >算法处理后的语音极高频段信号全被压缩至近6KHz以内，听力正常人聆听处理后语音会显得比较闷，但是对于高频段听损严重的该患者而言， </span><span >这样的压缩处理意味着有机会获得更多的高频段信息，对于帮助理解语音信号意义显著。 </span></div><div class="modify" align="right" paraseq="419"><span class="btn btn-blue" onclick="submitPart('从频谱对应关系和最终的语谱图对比可以看出：频段0-900Hz段信号保持不变，频段900-8000Hz内的信号被压缩至900-5980Hz。算法处理后的语音极高频段信号全被压缩至近6KHz以内，听力正常人聆听处理后语音会显得比较闷，但是对于高频段听损严重的该患者而言，这样的压缩处理意味着有机会获得更多的高频段信息，对于帮助理解语音信号意义显著。',this)" class="modify">段落修改</div></div><div align="center" class="navigation"><a href="paper_1.htm"><span class="btn_gray">首页</span></a><a  href="paper_4.htm"><span class="btn_gray">上一页</span></a><a href="paper_6.htm"><span class="btn_gray">下一页</span></a><a href="paper_6.htm">	<span class="btn_gray">尾页</span></a><span>页码：5/6页</span></div><div class="footer"><div align="center" class="a666" style="font-size:14px;padding-top:50px;padding-bottom:30px;"><div>检测报告由 <a class="nounderline" href="http://www.ptcheck.com" target="_blank">PTcheck</a>文献相似度检测系统生成 </div><div>Copyright © 2007-2016 PTcheck </div></div></div></div></body></html>

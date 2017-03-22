@@ -1,0 +1,446 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>PTcheck论文检测报告</title>
+		<link rel="stylesheet" href="../css/base.css" />
+		<style type="text/css">
+		a {
+    color: #0796fe;
+}
+a:hover{
+    color:#0796fe!important;
+}
+			.mainContainer {
+				padding: 20px;
+	
+			}
+			
+			.navigation span {
+				display: inline-block;
+				padding-left: 5px;
+				padding-right: 5px;
+				color: #666;
+			}
+			
+			.btn_gray {
+				border: solid 1px #dddddd;
+				background-color: #eeeeee;
+				border-radius: 5px;
+				cursor: pointer;
+			}
+			
+			.btn_gray:hover,
+			.btn_blue {
+				background-color: #0099ff;
+				border: solid 1px #0099ff;
+				color: #fff!important;
+				border-radius: 5px;
+				cursor: pointer;
+			}
+			.para{
+				padding-top:20px;
+			}
+			
+			.duanluo{
+				padding-left:20px;
+				
+				padding-bottom: 5px;
+			}
+			.duanluo span{
+				display: inline-block;
+				padding-left:5px;
+				padding-right: 5px;
+				border: solid 1px #999;
+				color:#999;
+			}
+			.l{
+				line-height: 20px;
+				padding-bottom: 5px;
+			}
+			.l span{
+				color:#333;
+			}
+			.mymodify{
+				font-size:12px;
+			}
+			.mymodify textarea{
+				width:98%;
+				height:100px;
+				color:#333;
+				clear:both;
+			}
+			textarea{
+				padding:10px;
+				line-height: 20px;
+			}
+		</style>
+		<script type="text/javascript">
+
+        var isstorage=false;
+        var danhao;
+        var result= new Array();
+         function trimStr(str) {
+
+            if ((typeof (str) != "string") || !str) {
+
+                return "";
+
+            }
+
+            return str.replace(/(^\s*)|(\s*$)/g, "");
+
+        }
+          
+        function myclick() {
+            window.parent.parent.ViewMain.window.location.href = "../../htmls/jianchong_.htm";
+        }
+        function submitPart(obj, target) {
+            var parent = target.parentNode;
+            if(parent.getAttribute("data")=="add"){
+              var mynext = parent.nextSibling;
+              parent.setAttribute("data","remove");
+              parent.parentNode.removeChild(mynext);
+            }
+            else{
+            	parent.setAttribute("data","add");
+            	var temphtml = document.createElement("div");
+                temphtml.innerHTML = "<input type=\"hidden\" value=\""+ parent.getAttribute("paraseq") +"\"><div name=\"mymodify\" class=\"mymodify\" >"
+					+"<div class=\"a999\">改重内容（请对本句修改之后，点击“临时保存”，然后进入报告左侧“修改文档”页面中获取修改后的内容）：</div>"
+					+"<div><textarea>"+obj
+					+"</textarea>"
+					+"</div>"
+					+"<div align=\"right\" class=\"a999\" style=\"margin-top:14px;\">（注意：改完请及时到“修改文档”复制到原文）<span class=\"btn-gray btn a333\" onclick=\"mysave(this)\">临时保存</span></div>"
+				+"</div>";
+            	   parent.parentNode.insertBefore(temphtml, null);
+            }
+
+        }
+
+		function myNavigate(){
+		 document.getElementById("a_url").click();
+		}
+       
+        function mysave(target) {
+            var tempsen = trimStr(target.parentNode.previousSibling.lastChild.value.replace(/\"/g,"\\\"").replace(/\'/g,"\\\'"));
+            var paraseq = target.parentNode.parentNode.parentNode.firstChild.value;            
+            var mydiv = target.parentNode.parentNode.parentNode.previousSibling;
+             if (mydiv.nodeName == "#text") {
+                mydiv = mydiv.previousSibling;
+            }
+             
+            mydiv.lastChild.setAttribute("onclick", "submitPart('" + tempsen + "',this)");
+           mydiv.setAttribute("data","remove");
+           if (mydiv.firstChild.innerHTML != "已修改") {
+                var xiugai = document.createElement("span");
+                xiugai.setAttribute("style", "font-size:12px;color:#00AEAE;margin-right:10px;");
+                xiugai.innerHTML = "已修改";
+                mydiv.insertBefore(xiugai, mydiv.lastChild);
+               }
+            
+            var parent = target.parentNode.parentNode.parentNode;
+            parent.parentNode.removeChild(parent);
+            if(!isstorage)
+            {
+            window.parent.parent.parent.myset(paraseq, tempsen);
+            }
+            else
+            {
+            myset(paraseq, tempsen);
+            }
+        }
+        window.onload = function() {
+            danhao = document.getElementById("danhao").value;
+            if (window.localStorage) {
+                isstorage = true;
+            }
+            if (!isstorage) {
+                result = window.parent.parent.parent.modifyPara;
+                
+            }
+            else {
+                var temp = localStorage.getItem(danhao);
+                if (temp) {
+                    result = eval("(" + temp + ")");
+                }
+            }
+            if (result) {
+            	
+                for (var i = 0; i < result.length; i++) {
+                	
+                    //var all = $(":hidden");
+                    var all = getClass("div","modify");
+                   
+                    for (var j = 0; j < all.length; j++) {
+                        if (all[j].getAttribute("paraseq") == result[i].para) {
+                        	
+                            var xiugai = document.createElement("span");
+                            xiugai.setAttribute("style", "font-size:12px;color:#00AEAE;margin-right:10px;");
+                            xiugai.innerHTML = "已修改";
+                            all[j].insertBefore(xiugai, all[j].lastChild);
+                            all[j].lastChild.setAttribute("onclick", "submitPart('" + result[i].text.replace(/\"/g,"\\\"").replace(/\'/g,"\\\'") + "',this)");
+                        }
+                    }
+
+                }
+            }  
+        }
+
+
+        function mydivclick(e,obj) {
+            if (e.target.tagName.toUpperCase() != "INPUT") {
+                obj.lastChild.previousSibling.click();
+            }
+        }
+
+        function getClass(tagname, className) { //tagname指元素，className指class的值
+            var tagname = document.getElementsByTagName(tagname);  //获取指定元素
+            var tagnameAll = [];     //这个数组用于存储所有符合条件的元素
+            for (var i = 0; i < tagname.length; i++) {     //遍历获得的元素
+                if (tagname[i].className == className) {     //如果获得的元素中的class的值等于指定的类名，就赋值给tagnameAll
+                    tagnameAll[tagnameAll.length] = tagname[i];
+                }
+            }
+            return tagnameAll;
+
+        }
+
+       
+        
+        
+         function myset(paraseq, sen) {
+         	
+            var reg = new RegExp("\"", "g")
+            var model = "{\"para\":\"" + paraseq + "\",\"text\": \"" + sen + "\"}";
+            var mo = eval("(" + model + ")");
+            var exist = false;
+            for (var i = 0; i < result.length; i++) {
+                if (mo.para == result[i].para) {
+                    exist = true;
+                    result[i].text = mo.text;
+                }
+            }
+            if (!exist) {
+                result.push(mo);
+            }
+            localStorage.removeItem(danhao);
+            localStorage.setItem(danhao, json_encode(result));
+        }
+        
+        function json_decode(str_json) {
+            // Decodes the JSON representation into a PHP value  
+            //  
+            // version: 906.1806  
+            // discuss at: http://phpjs.org/functions/json_decode  
+            // +      original by: Public Domain (http://www.json.org/json2.js)  
+            // + reimplemented by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)  
+            // + improved by: T.J. Leahy  
+            // *     example 1: json_decode('[\n    "e",\n    {\n    "pluribus": "unum"\n}\n]');  
+            // *     returns 1: ['e', {pluribus: 'unum'}]  
+            /* 
+            http://www.JSON.org/json2.js 
+            2008-11-19 
+            Public Domain. 
+            NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK. 
+            See http://www.JSON.org/js.html 
+            */
+
+            var json = this.window.JSON;
+            if (typeof json === 'object' && typeof json.parse === 'function') {
+                return json.parse(str_json);
+            }
+
+            var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
+            var j;
+            var text = str_json;
+
+            // Parsing happens in four stages. In the first stage, we replace certain  
+            // Unicode characters with escape sequences. JavaScript handles many characters  
+            // incorrectly, either silently deleting them, or treating them as line endings.  
+            cx.lastIndex = 0;
+            if (cx.test(text)) {
+                text = text.replace(cx, function(a) {
+                    return '\\u' +
+            ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+                });
+            }
+
+            // In the second stage, we run the text against regular expressions that look  
+            // for non-JSON patterns. We are especially concerned with '()' and 'new'  
+            // because they can cause invocation, and '=' because it can cause mutation.  
+            // But just to be safe, we want to reject all unexpected forms.  
+
+            // We split the second stage into 4 regexp operations in order to work around  
+            // crippling inefficiencies in IE's and Safari's regexp engines. First we  
+            // replace the JSON backslash pairs with '@' (a non-JSON character). Second, we  
+            // replace all simple value tokens with ']' characters. Third, we delete all  
+            // open brackets that follow a colon or comma or that begin the text. Finally,  
+            // we look to see that the remaining characters are only whitespace or ']' or  
+            // ',' or ':' or '{' or '}'. If that is so, then the text is safe for eval.  
+            if (/^[\],:{}\s]*$/.
+        test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@').
+            replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').
+            replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
+
+                // In the third stage we use the eval function to compile the text into a  
+                // JavaScript structure. The '{' operator is subject to a syntactic ambiguity  
+                // in JavaScript: it can begin a block or an object literal. We wrap the text  
+                // in parens to eliminate the ambiguity.  
+
+                j = eval('(' + text + ')');
+
+                return j;
+            }
+
+            // If the text is not JSON parseable, then a SyntaxError is thrown.  
+            throw new SyntaxError('json_decode');
+        }
+
+        function json_encode(mixed_val) {
+            // Returns the JSON representation of a value  
+            //  
+            // version: 906.1806  
+            // discuss at: http://phpjs.org/functions/json_encode  
+            // +      original by: Public Domain (http://www.json.org/json2.js)  
+            // + reimplemented by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)  
+            // + improved by: T.J. Leahy  
+            // *     example 1: json_encode(['e', {pluribus: 'unum'}]);  
+            // *     returns 1: '[\n    "e",\n    {\n    "pluribus": "unum"\n}\n]'  
+            /* 
+            http://www.JSON.org/json2.js 
+            2008-11-19 
+            Public Domain. 
+            NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK. 
+            See http://www.JSON.org/js.html 
+            */
+            var json = this.window.JSON;
+            if (typeof json === 'object' && typeof json.stringify === 'function') {
+                return json.stringify(mixed_val);
+            }
+
+            var value = mixed_val;
+
+            var quote = function(string) {
+                var escapable = /[\\\"\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
+                var meta = {    // table of character substitutions  
+                    '\b': '\\b',
+                    '\t': '\\t',
+                    '\n': '\\n',
+                    '\f': '\\f',
+                    '\r': '\\r',
+                    '"': '\\"',
+                    '\\': '\\\\'
+                };
+
+                escapable.lastIndex = 0;
+                return escapable.test(string) ?
+        '"' + string.replace(escapable, function(a) {
+            var c = meta[a];
+            return typeof c === 'string' ? c :
+            '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+        }) + '"' :
+        '"' + string + '"';
+            };
+
+            var str = function(key, holder) {
+                var gap = '';
+                var indent = '    ';
+                var i = 0;          // The loop counter.  
+                var k = '';          // The member key.  
+                var v = '';          // The member value.  
+                var length = 0;
+                var mind = gap;
+                var partial = [];
+                var value = holder[key];
+
+                // If the value has a toJSON method, call it to obtain a replacement value.  
+                if (value && typeof value === 'object' &&
+            typeof value.toJSON === 'function') {
+                    value = value.toJSON(key);
+                }
+
+                // What happens next depends on the value's type.  
+                switch (typeof value) {
+                    case 'string':
+                        return quote(value);
+
+                    case 'number':
+                        // JSON numbers must be finite. Encode non-finite numbers as null.  
+                        return isFinite(value) ? String(value) : 'null';
+
+                    case 'boolean':
+                    case 'null':
+                        // If the value is a boolean or null, convert it to a string. Note:  
+                        // typeof null does not produce 'null'. The case is included here in  
+                        // the remote chance that this gets fixed someday.  
+
+                        return String(value);
+
+                    case 'object':
+                        // If the type is 'object', we might be dealing with an object or an array or  
+                        // null.  
+                        // Due to a specification blunder in ECMAScript, typeof null is 'object',  
+                        // so watch out for that case.  
+                        if (!value) {
+                            return 'null';
+                        }
+
+                        // Make an array to hold the partial results of stringifying this object value.  
+                        gap += indent;
+                        partial = [];
+
+                        // Is the value an array?  
+                        if (Object.prototype.toString.apply(value) === '[object Array]') {
+                            // The value is an array. Stringify every element. Use null as a placeholder  
+                            // for non-JSON values.  
+
+                            length = value.length;
+                            for (i = 0; i < length; i += 1) {
+                                partial[i] = str(i, value) || 'null';
+                            }
+
+                            // Join all of the elements together, separated with commas, and wrap them in  
+                            // brackets.  
+                            v = partial.length === 0 ? '[]' :
+                    gap ? '[\n' + gap +
+                    partial.join(',\n' + gap) + '\n' +
+                    mind + ']' :
+                    '[' + partial.join(',') + ']';
+                            gap = mind;
+                            return v;
+                        }
+
+                        // Iterate through all of the keys in the object.  
+                        for (k in value) {
+                            if (Object.hasOwnProperty.call(value, k)) {
+                                v = str(k, value);
+                                if (v) {
+                                    partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                                }
+                            }
+                        }
+
+                        // Join all of the member texts together, separated with commas,  
+                        // and wrap them in braces.  
+                        v = partial.length === 0 ? '{}' :
+                gap ? '{\n' + gap + partial.join(',\n' + gap) + '\n' +
+                mind + '}' : '{' + partial.join(',') + '}';
+                        gap = mind;
+                        return v;
+                }
+            };
+
+            // Make a fake root object containing our value under the key of ''.  
+            // Return the result of stringifying the value.  
+            return str('', {
+                '': value
+            });
+        } 
+       
+    </script>
+	</head>
+
+	<body><a href="http://www.ptcheck.com/tea/segment.aspx" target="_blank" id="a_url" style="display:none;" ></a> <input type="hidden" id="danhao" value="2647220997972225" /><div class="mainContainer"><div align="center" class="navigation"><a href="paper_1.htm"><span class="btn_gray">首页</span></a><a  href="paper_5.htm"><span class="btn_gray">上一页</span></a><a href="#"><span class="btn_gray">下一页</span></a><a href="paper_6.htm">	<span class="btn_gray">尾页</span></a><span>页码：6/6页</span></div><div class="zhengwen"><div class="para"><div class="duanluo"><span>421</span></div><div class="l"><span style="margin-left:25px"></span><span >	本章小结 </span></div></div><div class="para"><div class="duanluo"><span>422</span></div><div class="l"><span style="margin-left:25px"></span><span >本章主要针对助听器中频率补偿类算法进行研究。 </span><span >首先，本章对频率类补偿算法的基本背景的适用情形等相关内容进行介绍。 </span><span >随后，第一节主要介绍已有的传统移频助听类算法，包括频谱压缩和频谱搬移两类处理方案，这类算法的研究已颇具历史， </span><span >在一些具有移频助听该功能的助听器中已投入使用； </span><span >第二节主要介绍在传统移频助听算法基础上所提出的频谱伸缩助听算法，针对传统移频助听算法的不足和局限性， </span><span >本节主要表述频谱伸缩算法的核心处理策略、参数选择策略，对频谱伸缩策略的基本原理和处理方案进行介绍； </span><span >最后，第三节进行仿真实验，介绍了选取的实验语料库，以及补偿案例效果，从仿真实验的基础上可以看出，算法在传统移频助听的基础上进行拓展， </span><span >能更好的适应不同类型的听力障碍患者。 </span></div><div class="modify" align="right" paraseq="421"><span class="btn btn-blue" onclick="submitPart('本章主要针对助听器中频率补偿类算法进行研究。首先，本章对频率类补偿算法的基本背景的适用情形等相关内容进行介绍。随后，第一节主要介绍已有的传统移频助听类算法，包括频谱压缩和频谱搬移两类处理方案，这类算法的研究已颇具历史，在一些具有移频助听该功能的助听器中已投入使用；第二节主要介绍在传统移频助听算法基础上所提出的频谱伸缩助听算法，针对传统移频助听算法的不足和局限性，本节主要表述频谱伸缩算法的核心处理策略、参数选择策略，对频谱伸缩策略的基本原理和处理方案进行介绍；最后，第三节进行仿真实验，介绍了选取的实验语料库，以及补偿案例效果，从仿真实验的基础上可以看出，算法在传统移频助听的基础上进行拓展，能更好的适应不同类型的听力障碍患者。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>423</span></div><div class="l"><span style="margin-left:25px"></span><span > 系统综合架构及测试 </span></div></div><div class="para"><div class="duanluo"><span>424</span></div><div class="l"><span style="margin-left:25px"></span><span >听力测试及补偿系统主要包含测听及补偿两个部分。 </span><span >听力测试部分各功能原理相对简明，核心在于操作流程； </span><span >补偿系统核心在于各补偿算法细节，系统操作流程相对简单。 </span><span >前文主要对听力测试部分和补偿算法进行介绍，本章将对系统的整体架构进行分析，同时对于系统中的各个功能进行测试。 </span></div><div class="modify" align="right" paraseq="423"><span class="btn btn-blue" onclick="submitPart('听力测试及补偿系统主要包含测听及补偿两个部分。听力测试部分各功能原理相对简明，核心在于操作流程；补偿系统核心在于各补偿算法细节，系统操作流程相对简单。前文主要对听力测试部分和补偿算法进行介绍，本章将对系统的整体架构进行分析，同时对于系统中的各个功能进行测试。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>425</span></div><div class="l"><span style="margin-left:25px"></span><span >6.1 测听及补偿系统综合架构设计 </span></div></div><div class="para"><div class="duanluo"><span>426</span></div><div class="l"><span style="margin-left:25px"></span><span >听力测试系统主要为使用者提供简单的听力情况自评测试功能，而补偿系统的目的则是提供助听补偿的功能，二者构成整个测听补偿系统。 </span><span >听力测试系统的结构在第三章已有详细分析，本节首先对补偿系统的结构进行介绍，然后介绍整个系统的综合架构。 </span></div><div class="modify" align="right" paraseq="425"><span class="btn btn-blue" onclick="submitPart('听力测试系统主要为使用者提供简单的听力情况自评测试功能，而补偿系统的目的则是提供助听补偿的功能，二者构成整个测听补偿系统。听力测试系统的结构在第三章已有详细分析，本节首先对补偿系统的结构进行介绍，然后介绍整个系统的综合架构。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>427</span></div><div class="l"><span style="margin-left:25px"></span><span >	补偿系统结构 </span></div></div><div class="para"><div class="duanluo"><span>428</span></div><div class="l"><span style="margin-left:25px"></span><span >助听补偿系统的整体结构如图6-1所示： </span></div></div><div class="para"><div class="duanluo"><span>429</span></div><div class="l"><span style="margin-left:25px"></span><span >图6-1助听补偿系统结构 </span></div></div><div class="para"><div class="duanluo"><span>430</span></div><div class="l"><span style="margin-left:25px"></span><span >	如前文所说，助听补偿部分的核心在于补偿算法的细节，因此其结构相对比较简明，主要包括算法参数计算和算法实施两部分。 </span></div><div class="modify" align="right" paraseq="429"><span class="btn btn-blue" onclick="submitPart('如前文所说，助听补偿部分的核心在于补偿算法的细节，因此其结构相对比较简明，主要包括算法参数计算和算法实施两部分。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>431</span></div><div class="l"><span style="margin-left:25px"></span><span >	其中算法参数计算部分的主要功能是给算法提供相应的参数值。 </span><span >该部分的数据源来自于测听系统给出的听力信息数据和算法提供给用户选择的接口。 </span><span >听力信息数据包括听力图信息、频率分辨能力等等； </span><span >用户输入信息包括补偿算法中频率补偿是否开启、通道选择等功能。 </span></div><div class="modify" align="right" paraseq="430"><span class="btn btn-blue" onclick="submitPart('其中算法参数计算部分的主要功能是给算法提供相应的参数值。该部分的数据源来自于测听系统给出的听力信息数据和算法提供给用户选择的接口。听力信息数据包括听力图信息、频率分辨能力等等；用户输入信息包括补偿算法中频率补偿是否开启、通道选择等功能。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>432</span></div><div class="l"><span style="margin-left:25px"></span><span >	补偿算法实施部分则是补偿算法的最终处理阶段。 </span><span >算法以实施输入语音作为程序输入、以算法参数为算法控制、 以补偿处理后的语音作为输出。 </span><span >该部分是算法的核心处理部分，其效果影响着整个补偿系统的补偿效果。 </span><span >因此，该部分是补偿系统中理论研究最为关键也是最为需要的部分。 </span></div><div class="modify" align="right" paraseq="431"><span class="btn btn-blue" onclick="submitPart('补偿算法实施部分则是补偿算法的最终处理阶段。算法以实施输入语音作为程序输入、以算法参数为算法控制、 以补偿处理后的语音作为输出。该部分是算法的核心处理部分，其效果影响着整个补偿系统的补偿效果。因此，该部分是补偿系统中理论研究最为关键也是最为需要的部分。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>433</span></div><div class="l"><span style="margin-left:25px"></span><span >	然而，在补偿系统中使用的具体补偿算法不同时，其相应的参数计算、算法实施等过程可能会有写差别（例如，响度补偿中可能会增加共振峰提取过程）， </span><span >图6-1所示结构仅是助听补偿系统普适结构。 </span></div><div class="modify" align="right" paraseq="432"><span class="btn btn-blue" onclick="submitPart('然而，在补偿系统中使用的具体补偿算法不同时，其相应的参数计算、算法实施等过程可能会有写差别（例如，响度补偿中可能会增加共振峰提取过程），图6-1所示结构仅是助听补偿系统普适结构。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>434</span></div><div class="l"><span style="margin-left:25px"></span><span >	系统综合架构 </span></div></div><div class="para"><div class="duanluo"><span>435</span></div><div class="l"><span style="margin-left:25px"></span><span >测听及补偿系统整体架构如图6-2所示： </span></div></div><div class="para"><div class="duanluo"><span>436</span></div><div class="l"><span style="margin-left:25px"></span><span >图6-2听力测试及助听补偿系统整体框架 </span></div></div><div class="para"><div class="duanluo"><span>437</span></div><div class="l"><span style="margin-left:25px"></span><span >	整个系统以Android移动终端为基础，划分为听力测试和助听补偿两部分。 </span><span >如前文所述，听力测试部分包括纯音听阈测试、音调分辨力测试以及言语测听等相关内容； </span><span >助听补偿部分则主要包含响度补偿和频率补偿等相关内容。 </span><span >两者之间通过以用户唯一标识命名的信息文件（userid.info）传递数据。 </span><span >听力测试部分将测试结果写入userid. </span><span >info文件，在助听补偿部分需要读取某些数据时，则按照信息文件的格式读出相应的数据即可。 </span><span >信息文件格式如表6-1所示： </span></div><div class="modify" align="right" paraseq="436"><span class="btn btn-blue" onclick="submitPart('整个系统以Android移动终端为基础，划分为听力测试和助听补偿两部分。如前文所述，听力测试部分包括纯音听阈测试、音调分辨力测试以及言语测听等相关内容；助听补偿部分则主要包含响度补偿和频率补偿等相关内容。两者之间通过以用户唯一标识命名的信息文件（userid.info）传递数据。听力测试部分将测试结果写入userid.info文件，在助听补偿部分需要读取某些数据时，则按照信息文件的格式读出相应的数据即可。信息文件格式如表6-1所示：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>438</span></div><div class="l"><span style="margin-left:25px"></span><span >表6-1信息文件格式 </span></div></div><div class="para"><div class="duanluo"><span>439</span></div><div class="l"><span style="margin-left:25px"></span><span >编号	参数说明	变量类型	字节数 </span></div></div><div class="para"><div class="duanluo"><span>440</span></div><div class="l"><span style="margin-left:25px"></span><span >1~11	听阈值	int[]	4*11 </span></div></div><div class="para"><div class="duanluo"><span>441</span></div><div class="l"><span style="margin-left:25px"></span><span >12~22	舒适阈值	int[]	4*11 </span></div></div><div class="para"><div class="duanluo"><span>442</span></div><div class="l"><span style="margin-left:25px"></span><span >23~33	痛阈值	int[]	4*11 </span></div></div><div class="para"><div class="duanluo"><span>443</span></div><div class="l"><span style="margin-left:25px"></span><span >34~44	音调分辨力值	double[]	8*11 </span></div></div><div class="para"><div class="duanluo"><span>444</span></div><div class="l"><span style="margin-left:25px"></span><span >45	言语识别率值	double	8*1 </span></div></div><div class="para"><div class="duanluo"><span>445</span></div><div class="l"><span style="margin-left:25px"></span><span >46	言语识别阈值	int	4*1 </span></div></div><div class="para"><div class="duanluo"><span>446</span></div><div class="l"><span style="margin-left:25px"></span><span >	在表6-1和图6-2所展示的功能及参数之外，测听系统以及助听补偿系统中还可以扩展相关的其他测试项及功能项，这时， </span><span >信息文件跟随相关功能需求进行扩展修改即可。 </span></div><div class="modify" align="right" paraseq="445"><span class="btn btn-blue" onclick="submitPart('在表6-1和图6-2所展示的功能及参数之外，测听系统以及助听补偿系统中还可以扩展相关的其他测试项及功能项，这时，信息文件跟随相关功能需求进行扩展修改即可。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>447</span></div><div class="l"><span style="margin-left:25px"></span><span >6.2 系统功能测试 </span></div></div><div class="para"><div class="duanluo"><span>448</span></div><div class="l"><span style="margin-left:25px"></span><span >	听力测试及助听补偿相关软件基于Android系统设计研发，运行于Android 4.0.3（API 15）及以上的安卓系统上。 </span><span >听力测试功能和助听补偿功能分别用单独的应用软件实现，两者通过文件系统存储和传递用户数据。 </span><span >下文将对听力测试软件及助听补偿软件相应功能进行介绍、分析及测试。 </span></div><div class="modify" align="right" paraseq="447"><span class="btn btn-blue" onclick="submitPart('听力测试及助听补偿相关软件基于Android系统设计研发，运行于Android 4.0.3（API 15）及以上的安卓系统上。听力测试功能和助听补偿功能分别用单独的应用软件实现，两者通过文件系统存储和传递用户数据。下文将对听力测试软件及助听补偿软件相应功能进行介绍、分析及测试。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>449</span></div><div class="l"><span style="margin-left:25px"></span><span >6.2.1 纯音听阈测试 </span></div></div><div class="para"><div class="duanluo"><span>450</span></div><div class="l"><span style="margin-left:25px"></span><span >	纯音听阈测试以3.3.1节所述升降法为基础，稍作修改进行检测。 </span><span >测试流程修改点主要在于：1.细化声压调节粒度至1dB HL；2. </span><span >增加舒适阈和痛阈选项，按照听阈测试的流程完成舒适阈和痛阈测试。 </span></div><div class="modify" align="right" paraseq="449"><span class="btn btn-blue" onclick="submitPart('纯音听阈测试以3.3.1节所述升降法为基础，稍作修改进行检测。测试流程修改点主要在于：1.细化声压调节粒度至1dB HL；2.增加舒适阈和痛阈选项，按照听阈测试的流程完成舒适阈和痛阈测试。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>451</span></div><div class="l"><span style="margin-left:25px"></span><span >	软件界面截图以及测试完成案例显示如下： </span></div></div><div class="para"><div class="duanluo"><span>452</span></div><div class="l"><span style="margin-left:25px"></span><span >图6-3纯音听阈测试界面 </span></div></div><div class="para"><div class="duanluo"><span>453</span></div><div class="l"><span style="margin-left:25px"></span><span >	图中左图为听阈测试操作界面，提供折线显示、频点切换、声强调节、用户反馈以及信息保存和历史记录查看等功能； </span><span >右图为一已测量完成的听阈痛阈舒适阈折线图。 </span><span >本测试所选包括125Hz-8kHz频段上的共11个频点，声强控制粒度为1dB，为了良好的测量效果和更准确的测量结果， </span><span >建议测试者使用耳机并处于安静的环境中进行测试。 </span></div><div class="modify" align="right" paraseq="452"><span class="btn btn-blue" onclick="submitPart('图中左图为听阈测试操作界面，提供折线显示、频点切换、声强调节、用户反馈以及信息保存和历史记录查看等功能；右图为一已测量完成的听阈痛阈舒适阈折线图。本测试所选包括125Hz-8kHz频段上的共11个频点，声强控制粒度为1dB，为了良好的测量效果和更准确的测量结果，建议测试者使用耳机并处于安静的环境中进行测试。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>454</span></div><div class="l"><span style="margin-left:25px"></span><span >6.2.2 频率分辨力测试 </span></div></div><div class="para"><div class="duanluo"><span>455</span></div><div class="l"><span style="margin-left:25px"></span><span >	如3.3.2节所述，本文所述移动终端系统采用改进的频率分辨力测试法，旨在进行固定声强下的频率分辨力大致测量， </span><span >以契合移动终端的实际条件并达到初步的频率分辨能力的检测效果，更专业的频率分辨力测试还需使用基于专业设备和心理物理调谐曲线的测试方法。 </span></div><div class="modify" align="right" paraseq="454"><span class="btn btn-blue" onclick="submitPart('如3.3.2节所述，本文所述移动终端系统采用改进的频率分辨力测试法，旨在进行固定声强下的频率分辨力大致测量，以契合移动终端的实际条件并达到初步的频率分辨能力的检测效果，更专业的频率分辨力测试还需使用基于专业设备和心理物理调谐曲线的测试方法。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>456</span></div><div class="l"><span style="margin-left:25px"></span><span >	如图6-4所示是频率分辨力测试软件操作界面以及某测试者（听力正常）测试结果： </span></div><div class="modify" align="right" paraseq="455"><span class="btn btn-blue" onclick="submitPart('如图6-4所示是频率分辨力测试软件操作界面以及某测试者（听力正常）测试结果：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>457</span></div><div class="l"><span style="margin-left:25px"></span><span >图6-4频率分辨力测试界面 </span></div></div><div class="para"><div class="duanluo"><span>458</span></div><div class="l"><span style="margin-left:25px"></span><span >受试者只需佩戴专业播放耳机，并选定声压级（即图中音量），测试过程中声压级固定，通过点击播放按钮，聆听短音信号，并做出选择&quot;相同&rdquo;或&quot;不同&rdquo;的选择， </span><span >每个频点的每一级分辨力的每组测试包含三次短音测试，全部正确方可进入下一级。 </span><span >测试频点涵盖125Hz-8000Hz的11个频点，整个测试所需时长大约在10分钟。 </span></div><div class="modify" align="right" paraseq="457"><span class="btn btn-blue" onclick="submitPart('受试者只需佩戴专业播放耳机，并选定声压级（即图中音量），测试过程中声压级固定，通过点击播放按钮，聆听短音信号，并做出选择&quot;相同&rdquo;或&quot;不同&rdquo;的选择，每个频点的每一级分辨力的每组测试包含三次短音测试，全部正确方可进入下一级。测试频点涵盖125Hz-8000Hz的11个频点，整个测试所需时长大约在10分钟。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>459</span></div><div class="l"><span style="margin-left:25px"></span><span >6.2.3 言语识别率测试 </span></div></div><div class="para"><div class="duanluo"><span>460</span></div><div class="l"><span style="margin-left:25px"></span><span >	言语识别率测试流程及原理如3.3.3节所述。 </span><span >测试按照先听后选的方式进行，受试者聆听语料，然后选择相应的文字及拼音所组成的选项中与所聆听到的语音相匹配的选项，软件将记录受试者的每次选项结果， </span><span >并在测试结束后显示整体测试结果。 </span></div><div class="modify" align="right" paraseq="459"><span class="btn btn-blue" onclick="submitPart('言语识别率测试流程及原理如3.3.3节所述。测试按照先听后选的方式进行，受试者聆听语料，然后选择相应的文字及拼音所组成的选项中与所聆听到的语音相匹配的选项，软件将记录受试者的每次选项结果，并在测试结束后显示整体测试结果。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>461</span></div><div class="l"><span style="margin-left:25px"></span><span >	测试交互界面及某次测试结果如图6-5所示： </span></div></div><div class="para"><div class="duanluo"><span>462</span></div><div class="l"><span style="margin-left:25px"></span><span >图6-5言语识别率测试流程界面 </span></div></div><div class="para"><div class="duanluo"><span>463</span></div><div class="l"><span style="margin-left:25px"></span><span >	言语识别率测试亦是固定声压级下进行。测试开始首先选择本次测试题库数目； </span><span >之后按照测试流程遍历完整个测试集，最终显示并记录测试结果。 </span></div><div class="modify" align="right" paraseq="462"><span class="btn btn-blue" onclick="submitPart('言语识别率测试亦是固定声压级下进行。测试开始首先选择本次测试题库数目；之后按照测试流程遍历完整个测试集，最终显示并记录测试结果。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>464</span></div><div class="l"><span style="margin-left:25px"></span><span >6.2.4 言语识别阈测试 </span></div></div><div class="para"><div class="duanluo"><span>465</span></div><div class="l"><span style="margin-left:25px"></span><span >	软件系统言语识别阈测试采用文献[21]所述方法，以双音节词组为测试语料，通过不断降低声压级遍历整个可听范围，最终使用公式（）计算言语识别阈。 </span><span >与言语识别率测试类似，受试者反馈方式为听词选字，选项由拼音和汉字组成。 </span></div><div class="modify" align="right" paraseq="464"><span class="btn btn-blue" onclick="submitPart('软件系统言语识别阈测试采用文献[21]所述方法，以双音节词组为测试语料，通过不断降低声压级遍历整个可听范围，最终使用公式（）计算言语识别阈。与言语识别率测试类似，受试者反馈方式为听词选字，选项由拼音和汉字组成。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>466</span></div><div class="l"><span style="margin-left:25px"></span><span >	图6-6为言语识别阈测试操作流程截图： </span></div></div><div class="para"><div class="duanluo"><span>467</span></div><div class="l"><span style="margin-left:25px"></span><span >图6-6言语识别阈测试流程界面 </span></div></div><div class="para"><div class="duanluo"><span>468</span></div><div class="l"><span style="margin-left:25px"></span><span >	测试开始时首先设定初始声强，初始声强影响着测试的准确性。 </span><span >由于词库容量有限，，当初始声强选择过大时，遍历完所有词组后仍未达到测试中止标准（某族测试全部无法听清），则无法测出言语识别阈。 </span><span >之后测试流程与言语识别率测试类似，通过聆听语料选择与其对应的选项。 </span><span >最终，测试成功的情况下给出测试结果。图即为某位听力基本完好的受试者所测结果。 </span><span >当初始声强设定不合理（过大）时，程序将会提示要求降低初始声压级后再次测试，如下图所示： </span></div><div class="modify" align="right" paraseq="467"><span class="btn btn-blue" onclick="submitPart('测试开始时首先设定初始声强，初始声强影响着测试的准确性。由于词库容量有限，，当初始声强选择过大时，遍历完所有词组后仍未达到测试中止标准（某族测试全部无法听清），则无法测出言语识别阈。之后测试流程与言语识别率测试类似，通过聆听语料选择与其对应的选项。最终，测试成功的情况下给出测试结果。图即为某位听力基本完好的受试者所测结果。当初始声强设定不合理（过大）时，程序将会提示要求降低初始声压级后再次测试，如下图所示：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>469</span></div><div class="l"><span style="margin-left:25px"></span><span >图6-7言语识别阈测试（过大初始声强）流程界面 </span></div></div><div class="para"><div class="duanluo"><span>470</span></div><div class="l"><span style="margin-left:25px"></span><span >6.2.5 助听补偿功能测试 </span></div></div><div class="para"><div class="duanluo"><span>471</span></div><div class="l"><span style="margin-left:25px"></span><span >	系统所提供补偿类功能由助听补偿软件实现。 </span><span >软件集成第四章响度补偿及第五章频率补偿算法，根据听力测试所得参数定制补偿参数，并实现补偿功能。 </span><span >助听补偿所需大部分参数均通过中间信息文件（userid. </span><span >info）获得，因此助听补偿软件界面主要实现补偿开关控制及部分参数设置功能。 </span></div><div class="modify" align="right" paraseq="470"><span class="btn btn-blue" onclick="submitPart('系统所提供补偿类功能由助听补偿软件实现。软件集成第四章响度补偿及第五章频率补偿算法，根据听力测试所得参数定制补偿参数，并实现补偿功能。助听补偿所需大部分参数均通过中间信息文件（userid.info）获得，因此助听补偿软件界面主要实现补偿开关控制及部分参数设置功能。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>472</span></div><div class="l"><span style="margin-left:25px"></span><span >	助听补偿界面如下图所示： </span></div></div><div class="para"><div class="duanluo"><span>473</span></div><div class="l"><span style="margin-left:25px"></span><span >图6-8补偿系统界面 </span></div></div><div class="para"><div class="duanluo"><span>474</span></div><div class="l"><span style="margin-left:25px"></span><span >	软件第一栏提供助听器开启和关闭功能（需连接专业耳机后方可开启，否则单个扬声器同时充当播放和录音功能将产生明显的啸叫）； </span><span >后两栏分别为响度补偿和频率补偿控制及参数设定模块，响度补偿中SCE factor参数控制配对比增强的程度，值为0-1之间，0表示不进行谱对比增强， </span><span >1则表示增强强度最强，详见4.3.2节； </span><span >一般而言，频率补偿开启关闭控制由听力图参数便可确定，本系统考虑进行频率补偿的特殊性，提供其开启关闭功能旨在给使用者更多的选择余地， </span><span >同时针对频率补偿中听力情况良好线V_a和听力损失中重度划分线V_b也提供调节能力，旨在为使用者提供更加匹配的频率补偿功能。 </span></div><div class="modify" align="right" paraseq="473"><span class="btn btn-blue" onclick="submitPart('软件第一栏提供助听器开启和关闭功能（需连接专业耳机后方可开启，否则单个扬声器同时充当播放和录音功能将产生明显的啸叫）；后两栏分别为响度补偿和频率补偿控制及参数设定模块，响度补偿中SCE factor参数控制配对比增强的程度，值为0-1之间，0表示不进行谱对比增强，1则表示增强强度最强，详见4.3.2节；一般而言，频率补偿开启关闭控制由听力图参数便可确定，本系统考虑进行频率补偿的特殊性，提供其开启关闭功能旨在给使用者更多的选择余地，同时针对频率补偿中听力情况良好线V_a和听力损失中重度划分线V_b也提供调节能力，旨在为使用者提供更加匹配的频率补偿功能。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>475</span></div><div class="l"><span style="margin-left:25px"></span><span >6.3 本章小结 </span></div></div><div class="para"><div class="duanluo"><span>476</span></div><div class="l"><span style="margin-left:25px"></span><span >	本章以前文所述理论为基础，分析基于移动终端的听力测试及补偿系统的整体架构和实现。 </span><span >第一节主要分析助听补偿系统软件设计结构，并阐述整个系统的整体架构； </span><span >第二节以具体功能细节为划分，展示软件系统各个部分功能，阐述实际操作流程和相应说明。 </span></div><div class="modify" align="right" paraseq="475"><span class="btn btn-blue" onclick="submitPart('本章以前文所述理论为基础，分析基于移动终端的听力测试及补偿系统的整体架构和实现。第一节主要分析助听补偿系统软件设计结构，并阐述整个系统的整体架构；第二节以具体功能细节为划分，展示软件系统各个部分功能，阐述实际操作流程和相应说明。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>477</span></div><div class="l"><span style="margin-left:25px"></span><span > 总结与展望 </span></div></div><div class="para"><div class="duanluo"><span>478</span></div><div class="l"><span style="margin-left:25px"></span><span >	随着现代社会的不断发展，听力情况愈发的得到人们的重视，同时严重的听力损失也在影响着成千上万的听障患者的日常生活。 </span><span >一方面， </span><span >长时间佩戴耳机、长期处于高分贝噪声环境、年龄增长机体功能衰退等等造成听力损失的原因不断的变得复杂； </span><span >另一方面，轻微听力损失往往会被人们忽视，听力保护意识薄弱，使得因听力损失而影响正常生活的人群不断增加。 </span><span >鉴于此，针对听力损失的出现的助听器及其相关内容的研究日益受到国内外学者的重视。 </span><span >本文以移动终端为载体，研究听力测试和助听补偿相关算法和内容，一方面对助听算法进行研究和拓展， </span><span >另一方面借助移动终端的普及型和便利性增加人们听力保护意识并增强对自身听力情况的了解。 </span></div><div class="modify" align="right" paraseq="477"><span class="btn btn-blue" onclick="submitPart('随着现代社会的不断发展，听力情况愈发的得到人们的重视，同时严重的听力损失也在影响着成千上万的听障患者的日常生活。一方面，长时间佩戴耳机、长期处于高分贝噪声环境、年龄增长机体功能衰退等等造成听力损失的原因不断的变得复杂；另一方面，轻微听力损失往往会被人们忽视，听力保护意识薄弱，使得因听力损失而影响正常生活的人群不断增加。鉴于此，针对听力损失的出现的助听器及其相关内容的研究日益受到国内外学者的重视。本文以移动终端为载体，研究听力测试和助听补偿相关算法和内容，一方面对助听算法进行研究和拓展，另一方面借助移动终端的普及型和便利性增加人们听力保护意识并增强对自身听力情况的了解。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>479</span></div><div class="l"><span style="margin-left:25px"></span><span >7.1 本文主要工作总结 </span></div></div><div class="para"><div class="duanluo"><span>480</span></div><div class="l"><span style="margin-left:25px"></span><span >	（1）本文第三章阐述听力测试系统各部分结构及原理，在已有测听理论的基础上，基于终端完成各测试操作流程设计，并编程实现各个测试具体内容， </span><span >同时考虑到系统设计的初衷以及使用者操作的便利性，部分测试以放弃测试结果精确程度的代价，极大降低测试复杂度和耗时， </span><span >同时所提供的频率分辨精度能够使受试者对其自身听力情况有基本的了解。 </span></div><div class="modify" align="right" paraseq="479"><span class="btn btn-blue" onclick="submitPart('（1）本文第三章阐述听力测试系统各部分结构及原理，在已有测听理论的基础上，基于终端完成各测试操作流程设计，并编程实现各个测试具体内容，同时考虑到系统设计的初衷以及使用者操作的便利性，部分测试以放弃测试结果精确程度的代价，极大降低测试复杂度和耗时，同时所提供的频率分辨精度能够使受试者对其自身听力情况有基本的了解。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>481</span></div><div class="l"><span style="margin-left:25px"></span><span >	（2）本文第四章针对响度补偿算法处理后语音信噪比以及噪声环境下语音可懂度提高等问题，研究谱对比增强算法，并提出一种基于共振峰增强的谱对比增强算法。 </span><span >算法从语音基本特征入手，利用快速傅里叶变换模拟多通道处理，对每帧信号整体频谱进行补偿处理，同时对传统处方公式进行改进，增加限幅输出原则， </span><span >以保护佩戴者听力能力。 </span><span >算法计算量较低，适合移动终端的通用计算能力，同时输出语音频谱共振峰频点处得到较多补偿，语音整体可懂度有所提高， </span><span >并且经过共振峰增强和谱对比增强之后语音信号信噪比得到提升，频谱清晰度提升，处理后的语音最后经过响度增益增强， </span><span >保证了听损严重区域的频谱强度以及语音的整体声强。 </span><span >算法旨在响度补偿算法的频谱微处理，通过语音特征的增强以及整体频谱的对比均衡处理，提高响度补偿算法所输出语音的可懂度，以及其抗躁能力， </span><span >为助听器响度补偿算法研究特别是植入耳蜗噪声环境下补偿效果提升提供思路和方案。 </span></div><div class="modify" align="right" paraseq="480"><span class="btn btn-blue" onclick="submitPart('（2）本文第四章针对响度补偿算法处理后语音信噪比以及噪声环境下语音可懂度提高等问题，研究谱对比增强算法，并提出一种基于共振峰增强的谱对比增强算法。算法从语音基本特征入手，利用快速傅里叶变换模拟多通道处理，对每帧信号整体频谱进行补偿处理，同时对传统处方公式进行改进，增加限幅输出原则，以保护佩戴者听力能力。算法计算量较低，适合移动终端的通用计算能力，同时输出语音频谱共振峰频点处得到较多补偿，语音整体可懂度有所提高，并且经过共振峰增强和谱对比增强之后语音信号信噪比得到提升，频谱清晰度提升，处理后的语音最后经过响度增益增强，保证了听损严重区域的频谱强度以及语音的整体声强。算法旨在响度补偿算法的频谱微处理，通过语音特征的增强以及整体频谱的对比均衡处理，提高响度补偿算法所输出语音的可懂度，以及其抗躁能力，为助听器响度补偿算法研究特别是植入耳蜗噪声环境下补偿效果提升提供思路和方案。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>482</span></div><div class="l"><span style="margin-left:25px"></span><span >	（3）本文第五章针对传统频率补偿方案的局限性提出一种基于频谱拉伸压缩处理结合的频率补偿方法。 </span><span >传统频率补偿方案均针对最高频段听损严重患者进行降频补偿，有的通过频谱压缩达到降频效果，有的则通过频谱搬移完成，其目的是充分利用患者剩余听力良好频段， </span><span >将高频信息转移至较低频段。 </span><span >然而，这种转移的前提是听损患者是高频听损严重类型，且此类处理方法对频谱的影响较大，补偿后语音变化较大。 </span><span >频谱伸缩算法亦是以充分利用患者剩余听力良好频段为目的，设计一种新的频谱变化方案。 </span><span >根据患者听力图类型确定压缩频段和拉伸频段，尽量将听损严重频段的信号扩散至听力情况良好的频段，同时控制压缩和拉伸的程度， </span><span >减小频谱压缩和拉伸处理带来的副作用。 </span><span >算法对听损严重患者听力图进行分类，并针对不同类型的听力图提供不同的补偿方案，使算法的适应性和适用性得到较好提高，同时补偿方案也更具有定制性， </span><span >与待补偿患者的听力情况更为贴切。 </span></div><div class="modify" align="right" paraseq="481"><span class="btn btn-blue" onclick="submitPart('（3）本文第五章针对传统频率补偿方案的局限性提出一种基于频谱拉伸压缩处理结合的频率补偿方法。传统频率补偿方案均针对最高频段听损严重患者进行降频补偿，有的通过频谱压缩达到降频效果，有的则通过频谱搬移完成，其目的是充分利用患者剩余听力良好频段，将高频信息转移至较低频段。然而，这种转移的前提是听损患者是高频听损严重类型，且此类处理方法对频谱的影响较大，补偿后语音变化较大。频谱伸缩算法亦是以充分利用患者剩余听力良好频段为目的，设计一种新的频谱变化方案。根据患者听力图类型确定压缩频段和拉伸频段，尽量将听损严重频段的信号扩散至听力情况良好的频段，同时控制压缩和拉伸的程度，减小频谱压缩和拉伸处理带来的副作用。算法对听损严重患者听力图进行分类，并针对不同类型的听力图提供不同的补偿方案，使算法的适应性和适用性得到较好提高，同时补偿方案也更具有定制性，与待补偿患者的听力情况更为贴切。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>483</span></div><div class="l"><span style="margin-left:25px"></span><span >	（4）本文第体六章首先阐述基于移动终端的助听补偿系统设计，并分析听力测试及助听补偿系统的整架构。 </span><span >随后给出听力测试系统和助听补偿系统间的联系文件的详细结构。 </span><span >最后，对系统中各个功能进行展示及测试，并对每个测试功能进行简要分析。 </span><span >至此，整个听力测试和助听补偿系统基本阐述完成。 </span></div><div class="modify" align="right" paraseq="482"><span class="btn btn-blue" onclick="submitPart('（4）本文第体六章首先阐述基于移动终端的助听补偿系统设计，并分析听力测试及助听补偿系统的整架构。随后给出听力测试系统和助听补偿系统间的联系文件的详细结构。最后，对系统中各个功能进行展示及测试，并对每个测试功能进行简要分析。至此，整个听力测试和助听补偿系统基本阐述完成。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>484</span></div><div class="l"><span style="margin-left:25px"></span><span >7.2 展望 </span></div></div><div class="para"><div class="duanluo"><span>485</span></div><div class="l"><span style="margin-left:25px"></span><span >	虽然本文在测听理论以及补偿理论的基础上完成听力测试及助听补偿系统的基本设计，但是其中相关测试内容及算法均处于初生阶段，本人研究时间和水平均有限， </span><span >因此，这里对后续可研究内容和方向进行展望： </span></div><div class="modify" align="right" paraseq="484"><span class="btn btn-blue" onclick="submitPart('虽然本文在测听理论以及补偿理论的基础上完成听力测试及助听补偿系统的基本设计，但是其中相关测试内容及算法均处于初生阶段，本人研究时间和水平均有限，因此，这里对后续可研究内容和方向进行展望：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>486</span></div><div class="l"><span style="margin-left:25px"></span><span >	（1）听力测试系统可以继续完善。更加完善的听力测试系统可以加入PC段软件的支持。 </span><span >一方面，在有条件的情况下PC软件操作更为方便； </span><span >另一方面，PC的计算能力和处理能力相对移动终端而言也有提升。 </span></div><div class="modify" align="right" paraseq="485"><span class="btn btn-blue" onclick="submitPart('（1）听力测试系统可以继续完善。更加完善的听力测试系统可以加入PC段软件的支持。一方面，在有条件的情况下PC软件操作更为方便；另一方面，PC的计算能力和处理能力相对移动终端而言也有提升。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>487</span></div><div class="l"><span style="margin-left:25px"></span><span >	（2）听力测试系统可添加更多的听力测试。 </span><span >基于移动终端设计听力测试系统的一个重要因素和目的即是提高人们听力保护意识。 </span><span >增加更过基于听力测试和听力保护的相关内容会使得听力测试系统更加丰满，更加实用。 </span></div><div class="modify" align="right" paraseq="486"><span class="btn btn-blue" onclick="submitPart('（2）听力测试系统可添加更多的听力测试。基于移动终端设计听力测试系统的一个重要因素和目的即是提高人们听力保护意识。增加更过基于听力测试和听力保护的相关内容会使得听力测试系统更加丰满，更加实用。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>488</span></div><div class="l"><span style="margin-left:25px"></span><span >	（3）目前助听补偿系统只提供了本文所述的两种补偿算法，缺少对比性，同时助听补偿系统所用算法过于单一。 </span><span >将响度补偿相关的已有经典算法继承入助听补偿系统，并为使用者开放算法切换接口。 </span><span >助听算法的增加和完善可以使助听补偿系统对助听器选配有提前的体验和指导。 </span></div><div class="modify" align="right" paraseq="487"><span class="btn btn-blue" onclick="submitPart('（3）目前助听补偿系统只提供了本文所述的两种补偿算法，缺少对比性，同时助听补偿系统所用算法过于单一。将响度补偿相关的已有经典算法继承入助听补偿系统，并为使用者开放算法切换接口。助听算法的增加和完善可以使助听补偿系统对助听器选配有提前的体验和指导。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>489</span></div><div class="l"><span style="margin-left:25px"></span><span >	（4）目前本文并未研究基于频谱搬移的助听效果研究。 </span><span >对听损严重频段的信号是否通过搬移处理会获得更好的补偿效果还不得而知。 </span><span >基于频谱伸缩的助听补偿算法可以基于频谱搬移处理进行衍生，利用搬移的方法转移听损严重频段信号并对其他频段信号进行适当压缩或拉伸，并对比补偿效果。 </span></div><div class="modify" align="right" paraseq="488"><span class="btn btn-blue" onclick="submitPart('（4）目前本文并未研究基于频谱搬移的助听效果研究。对听损严重频段的信号是否通过搬移处理会获得更好的补偿效果还不得而知。基于频谱伸缩的助听补偿算法可以基于频谱搬移处理进行衍生，利用搬移的方法转移听损严重频段信号并对其他频段信号进行适当压缩或拉伸，并对比补偿效果。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>490</span></div><div class="l"><span style="margin-left:25px"></span><span >	（5）听力测试及助听补偿系统的软件界面设计及操作反馈流程可以优化，提升系统使用体验。 </span></div><div class="modify" align="right" paraseq="489"><span class="btn btn-blue" onclick="submitPart('（5）听力测试及助听补偿系统的软件界面设计及操作反馈流程可以优化，提升系统使用体验。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>491</span></div><div class="l"><span style="margin-left:25px"></span><span >致谢 </span></div></div><div class="para"><div class="duanluo"><span>492</span></div><div class="l"><span style="margin-left:25px"></span><a href="../sentence_detail/1171.htm" target="right" class="orange">	时间如白驹过隙，三年研究生时光即将结束。这三年的学习生活，收获丰富，受益良多。</a><span >一路走来，有许多指导、帮助过我的人相伴，没有你们就不会有现在的我。 </span></div><div class="modify" align="right" paraseq="491"><span class="btn btn-blue" onclick="submitPart('时间如白驹过隙，三年研究生时光即将结束。这三年的学习生活，收获丰富，受益良多。一路走来，有许多指导、帮助过我的人相伴，没有你们就不会有现在的我。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>493</span></div><div class="l"><span style="margin-left:25px"></span><a href="../sentence_detail/1173.htm" target="right" class="orange">	首先我要感谢我的导师赵力教授。赵老师在我的学术研究上给予了许多帮助。</a><span >从论文选题到具体研究再到系统改进，导师都付出了大量心血，他的指导和帮助是我能够顺利完成课题研究的关键； </span><span >导师治学严谨、平易近人，生活中亦给予了贴心的帮助和关心。 </span><span >转眼间就要毕业了，但是师生情谊不会随着时间的流逝而消失，由衷地感谢导师一直以来的关心和帮助。 </span></div><div class="modify" align="right" paraseq="492"><span class="btn btn-blue" onclick="submitPart('首先我要感谢我的导师赵力教授。赵老师在我的学术研究上给予了许多帮助。从论文选题到具体研究再到系统改进，导师都付出了大量心血，他的指导和帮助是我能够顺利完成课题研究的关键；导师治学严谨、平易近人，生活中亦给予了贴心的帮助和关心。转眼间就要毕业了，但是师生情谊不会随着时间的流逝而消失，由衷地感谢导师一直以来的关心和帮助。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>494</span></div><div class="l"><span style="margin-left:25px"></span><span >	感谢梁瑞宇、王青云博士，他们开拓的思维、对科研的执着和态度，感染者身边的每个人。 </span><span >在课题研究当中他们给予了宝贵的意见，并无私的帮助我完成课题研究。谢谢你们。 </span></div><div class="modify" align="right" paraseq="493"><span class="btn btn-blue" onclick="submitPart('感谢梁瑞宇、王青云博士，他们开拓的思维、对科研的执着和态度，感染者身边的每个人。在课题研究当中他们给予了宝贵的意见，并无私的帮助我完成课题研究。谢谢你们。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>495</span></div><div class="l"><span style="margin-left:25px"></span><span >	感谢实验室的同门和研究伙伴们，是大家共同的努力，使得实验室的氛围和环境如此温馨积极，也感谢你们给予的帮助和关怀。 </span><span >感谢你们每一个人：何旭、黄晨、陈晟、丁一坤、蒋浩、刘成宇、刘耘、皮慧、谢跃、张明阳、张奇、张祺威、邹炉庚、张希龙、黄玉洁、卢小芳， </span><span >愿你们在新的人生阶段展翅高飞。 </span></div><div class="modify" align="right" paraseq="494"><span class="btn btn-blue" onclick="submitPart('感谢实验室的同门和研究伙伴们，是大家共同的努力，使得实验室的氛围和环境如此温馨积极，也感谢你们给予的帮助和关怀。感谢你们每一个人：何旭、黄晨、陈晟、丁一坤、蒋浩、刘成宇、刘耘、皮慧、谢跃、张明阳、张奇、张祺威、邹炉庚、张希龙、黄玉洁、卢小芳，愿你们在新的人生阶段展翅高飞。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>496</span></div><div class="l"><span style="margin-left:25px"></span><span >	感谢我的父母，他们的关爱和支持是我一直以来的精神支柱，没有父母，就没有我。 </span><span >渐渐地长大了，很少陪在父母身边，希望他们健康平安。  </span></div><div class="modify" align="right" paraseq="495"><span class="btn btn-blue" onclick="submitPart('感谢我的父母，他们的关爱和支持是我一直以来的精神支柱，没有父母，就没有我。渐渐地长大了，很少陪在父母身边，希望他们健康平安。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>497</span></div><div class="l"><span style="margin-left:25px"></span><span >	感谢审阅论文的老师们，感谢你们的宝贵意见，希望大家都有更多的学术成果出现。 </span></div><div class="modify" align="right" paraseq="496"><span class="btn btn-blue" onclick="submitPart('感谢审阅论文的老师们，感谢你们的宝贵意见，希望大家都有更多的学术成果出现。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>498</span></div><div class="l"><span style="margin-left:25px"></span><span >	最后，再次感谢所有给予关心和帮助的老师、同学、家人和朋友，希望你们平安健康，幸福快乐！ </span></div><div class="modify" align="right" paraseq="497"><span class="btn btn-blue" onclick="submitPart('最后，再次感谢所有给予关心和帮助的老师、同学、家人和朋友，希望你们平安健康，幸福快乐！',this)" class="modify">段落修改</div></div><div align="center" class="navigation"><a href="paper_1.htm"><span class="btn_gray">首页</span></a><a  href="paper_5.htm"><span class="btn_gray">上一页</span></a><a href="#"><span class="btn_gray">下一页</span></a><a href="paper_6.htm">	<span class="btn_gray">尾页</span></a><span>页码：6/6页</span></div><div class="footer"><div align="center" class="a666" style="font-size:14px;padding-top:50px;padding-bottom:30px;"><div>检测报告由 <a class="nounderline" href="http://www.ptcheck.com" target="_blank">PTcheck</a>文献相似度检测系统生成 </div><div>Copyright © 2007-2016 PTcheck </div></div></div></div></body></html>

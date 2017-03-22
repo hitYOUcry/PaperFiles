@@ -1,0 +1,446 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>PTcheck论文检测报告</title>
+		<link rel="stylesheet" href="../css/base.css" />
+		<style type="text/css">
+		a {
+    color: #0796fe;
+}
+a:hover{
+    color:#0796fe!important;
+}
+			.mainContainer {
+				padding: 20px;
+	
+			}
+			
+			.navigation span {
+				display: inline-block;
+				padding-left: 5px;
+				padding-right: 5px;
+				color: #666;
+			}
+			
+			.btn_gray {
+				border: solid 1px #dddddd;
+				background-color: #eeeeee;
+				border-radius: 5px;
+				cursor: pointer;
+			}
+			
+			.btn_gray:hover,
+			.btn_blue {
+				background-color: #0099ff;
+				border: solid 1px #0099ff;
+				color: #fff!important;
+				border-radius: 5px;
+				cursor: pointer;
+			}
+			.para{
+				padding-top:20px;
+			}
+			
+			.duanluo{
+				padding-left:20px;
+				
+				padding-bottom: 5px;
+			}
+			.duanluo span{
+				display: inline-block;
+				padding-left:5px;
+				padding-right: 5px;
+				border: solid 1px #999;
+				color:#999;
+			}
+			.l{
+				line-height: 20px;
+				padding-bottom: 5px;
+			}
+			.l span{
+				color:#333;
+			}
+			.mymodify{
+				font-size:12px;
+			}
+			.mymodify textarea{
+				width:98%;
+				height:100px;
+				color:#333;
+				clear:both;
+			}
+			textarea{
+				padding:10px;
+				line-height: 20px;
+			}
+		</style>
+		<script type="text/javascript">
+
+        var isstorage=false;
+        var danhao;
+        var result= new Array();
+         function trimStr(str) {
+
+            if ((typeof (str) != "string") || !str) {
+
+                return "";
+
+            }
+
+            return str.replace(/(^\s*)|(\s*$)/g, "");
+
+        }
+          
+        function myclick() {
+            window.parent.parent.ViewMain.window.location.href = "../../htmls/jianchong_.htm";
+        }
+        function submitPart(obj, target) {
+            var parent = target.parentNode;
+            if(parent.getAttribute("data")=="add"){
+              var mynext = parent.nextSibling;
+              parent.setAttribute("data","remove");
+              parent.parentNode.removeChild(mynext);
+            }
+            else{
+            	parent.setAttribute("data","add");
+            	var temphtml = document.createElement("div");
+                temphtml.innerHTML = "<input type=\"hidden\" value=\""+ parent.getAttribute("paraseq") +"\"><div name=\"mymodify\" class=\"mymodify\" >"
+					+"<div class=\"a999\">改重内容（请对本句修改之后，点击“临时保存”，然后进入报告左侧“修改文档”页面中获取修改后的内容）：</div>"
+					+"<div><textarea>"+obj
+					+"</textarea>"
+					+"</div>"
+					+"<div align=\"right\" class=\"a999\" style=\"margin-top:14px;\">（注意：改完请及时到“修改文档”复制到原文）<span class=\"btn-gray btn a333\" onclick=\"mysave(this)\">临时保存</span></div>"
+				+"</div>";
+            	   parent.parentNode.insertBefore(temphtml, null);
+            }
+
+        }
+
+		function myNavigate(){
+		 document.getElementById("a_url").click();
+		}
+       
+        function mysave(target) {
+            var tempsen = trimStr(target.parentNode.previousSibling.lastChild.value.replace(/\"/g,"\\\"").replace(/\'/g,"\\\'"));
+            var paraseq = target.parentNode.parentNode.parentNode.firstChild.value;            
+            var mydiv = target.parentNode.parentNode.parentNode.previousSibling;
+             if (mydiv.nodeName == "#text") {
+                mydiv = mydiv.previousSibling;
+            }
+             
+            mydiv.lastChild.setAttribute("onclick", "submitPart('" + tempsen + "',this)");
+           mydiv.setAttribute("data","remove");
+           if (mydiv.firstChild.innerHTML != "已修改") {
+                var xiugai = document.createElement("span");
+                xiugai.setAttribute("style", "font-size:12px;color:#00AEAE;margin-right:10px;");
+                xiugai.innerHTML = "已修改";
+                mydiv.insertBefore(xiugai, mydiv.lastChild);
+               }
+            
+            var parent = target.parentNode.parentNode.parentNode;
+            parent.parentNode.removeChild(parent);
+            if(!isstorage)
+            {
+            window.parent.parent.parent.myset(paraseq, tempsen);
+            }
+            else
+            {
+            myset(paraseq, tempsen);
+            }
+        }
+        window.onload = function() {
+            danhao = document.getElementById("danhao").value;
+            if (window.localStorage) {
+                isstorage = true;
+            }
+            if (!isstorage) {
+                result = window.parent.parent.parent.modifyPara;
+                
+            }
+            else {
+                var temp = localStorage.getItem(danhao);
+                if (temp) {
+                    result = eval("(" + temp + ")");
+                }
+            }
+            if (result) {
+            	
+                for (var i = 0; i < result.length; i++) {
+                	
+                    //var all = $(":hidden");
+                    var all = getClass("div","modify");
+                   
+                    for (var j = 0; j < all.length; j++) {
+                        if (all[j].getAttribute("paraseq") == result[i].para) {
+                        	
+                            var xiugai = document.createElement("span");
+                            xiugai.setAttribute("style", "font-size:12px;color:#00AEAE;margin-right:10px;");
+                            xiugai.innerHTML = "已修改";
+                            all[j].insertBefore(xiugai, all[j].lastChild);
+                            all[j].lastChild.setAttribute("onclick", "submitPart('" + result[i].text.replace(/\"/g,"\\\"").replace(/\'/g,"\\\'") + "',this)");
+                        }
+                    }
+
+                }
+            }  
+        }
+
+
+        function mydivclick(e,obj) {
+            if (e.target.tagName.toUpperCase() != "INPUT") {
+                obj.lastChild.previousSibling.click();
+            }
+        }
+
+        function getClass(tagname, className) { //tagname指元素，className指class的值
+            var tagname = document.getElementsByTagName(tagname);  //获取指定元素
+            var tagnameAll = [];     //这个数组用于存储所有符合条件的元素
+            for (var i = 0; i < tagname.length; i++) {     //遍历获得的元素
+                if (tagname[i].className == className) {     //如果获得的元素中的class的值等于指定的类名，就赋值给tagnameAll
+                    tagnameAll[tagnameAll.length] = tagname[i];
+                }
+            }
+            return tagnameAll;
+
+        }
+
+       
+        
+        
+         function myset(paraseq, sen) {
+         	
+            var reg = new RegExp("\"", "g")
+            var model = "{\"para\":\"" + paraseq + "\",\"text\": \"" + sen + "\"}";
+            var mo = eval("(" + model + ")");
+            var exist = false;
+            for (var i = 0; i < result.length; i++) {
+                if (mo.para == result[i].para) {
+                    exist = true;
+                    result[i].text = mo.text;
+                }
+            }
+            if (!exist) {
+                result.push(mo);
+            }
+            localStorage.removeItem(danhao);
+            localStorage.setItem(danhao, json_encode(result));
+        }
+        
+        function json_decode(str_json) {
+            // Decodes the JSON representation into a PHP value  
+            //  
+            // version: 906.1806  
+            // discuss at: http://phpjs.org/functions/json_decode  
+            // +      original by: Public Domain (http://www.json.org/json2.js)  
+            // + reimplemented by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)  
+            // + improved by: T.J. Leahy  
+            // *     example 1: json_decode('[\n    "e",\n    {\n    "pluribus": "unum"\n}\n]');  
+            // *     returns 1: ['e', {pluribus: 'unum'}]  
+            /* 
+            http://www.JSON.org/json2.js 
+            2008-11-19 
+            Public Domain. 
+            NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK. 
+            See http://www.JSON.org/js.html 
+            */
+
+            var json = this.window.JSON;
+            if (typeof json === 'object' && typeof json.parse === 'function') {
+                return json.parse(str_json);
+            }
+
+            var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
+            var j;
+            var text = str_json;
+
+            // Parsing happens in four stages. In the first stage, we replace certain  
+            // Unicode characters with escape sequences. JavaScript handles many characters  
+            // incorrectly, either silently deleting them, or treating them as line endings.  
+            cx.lastIndex = 0;
+            if (cx.test(text)) {
+                text = text.replace(cx, function(a) {
+                    return '\\u' +
+            ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+                });
+            }
+
+            // In the second stage, we run the text against regular expressions that look  
+            // for non-JSON patterns. We are especially concerned with '()' and 'new'  
+            // because they can cause invocation, and '=' because it can cause mutation.  
+            // But just to be safe, we want to reject all unexpected forms.  
+
+            // We split the second stage into 4 regexp operations in order to work around  
+            // crippling inefficiencies in IE's and Safari's regexp engines. First we  
+            // replace the JSON backslash pairs with '@' (a non-JSON character). Second, we  
+            // replace all simple value tokens with ']' characters. Third, we delete all  
+            // open brackets that follow a colon or comma or that begin the text. Finally,  
+            // we look to see that the remaining characters are only whitespace or ']' or  
+            // ',' or ':' or '{' or '}'. If that is so, then the text is safe for eval.  
+            if (/^[\],:{}\s]*$/.
+        test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@').
+            replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').
+            replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
+
+                // In the third stage we use the eval function to compile the text into a  
+                // JavaScript structure. The '{' operator is subject to a syntactic ambiguity  
+                // in JavaScript: it can begin a block or an object literal. We wrap the text  
+                // in parens to eliminate the ambiguity.  
+
+                j = eval('(' + text + ')');
+
+                return j;
+            }
+
+            // If the text is not JSON parseable, then a SyntaxError is thrown.  
+            throw new SyntaxError('json_decode');
+        }
+
+        function json_encode(mixed_val) {
+            // Returns the JSON representation of a value  
+            //  
+            // version: 906.1806  
+            // discuss at: http://phpjs.org/functions/json_encode  
+            // +      original by: Public Domain (http://www.json.org/json2.js)  
+            // + reimplemented by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)  
+            // + improved by: T.J. Leahy  
+            // *     example 1: json_encode(['e', {pluribus: 'unum'}]);  
+            // *     returns 1: '[\n    "e",\n    {\n    "pluribus": "unum"\n}\n]'  
+            /* 
+            http://www.JSON.org/json2.js 
+            2008-11-19 
+            Public Domain. 
+            NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK. 
+            See http://www.JSON.org/js.html 
+            */
+            var json = this.window.JSON;
+            if (typeof json === 'object' && typeof json.stringify === 'function') {
+                return json.stringify(mixed_val);
+            }
+
+            var value = mixed_val;
+
+            var quote = function(string) {
+                var escapable = /[\\\"\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
+                var meta = {    // table of character substitutions  
+                    '\b': '\\b',
+                    '\t': '\\t',
+                    '\n': '\\n',
+                    '\f': '\\f',
+                    '\r': '\\r',
+                    '"': '\\"',
+                    '\\': '\\\\'
+                };
+
+                escapable.lastIndex = 0;
+                return escapable.test(string) ?
+        '"' + string.replace(escapable, function(a) {
+            var c = meta[a];
+            return typeof c === 'string' ? c :
+            '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+        }) + '"' :
+        '"' + string + '"';
+            };
+
+            var str = function(key, holder) {
+                var gap = '';
+                var indent = '    ';
+                var i = 0;          // The loop counter.  
+                var k = '';          // The member key.  
+                var v = '';          // The member value.  
+                var length = 0;
+                var mind = gap;
+                var partial = [];
+                var value = holder[key];
+
+                // If the value has a toJSON method, call it to obtain a replacement value.  
+                if (value && typeof value === 'object' &&
+            typeof value.toJSON === 'function') {
+                    value = value.toJSON(key);
+                }
+
+                // What happens next depends on the value's type.  
+                switch (typeof value) {
+                    case 'string':
+                        return quote(value);
+
+                    case 'number':
+                        // JSON numbers must be finite. Encode non-finite numbers as null.  
+                        return isFinite(value) ? String(value) : 'null';
+
+                    case 'boolean':
+                    case 'null':
+                        // If the value is a boolean or null, convert it to a string. Note:  
+                        // typeof null does not produce 'null'. The case is included here in  
+                        // the remote chance that this gets fixed someday.  
+
+                        return String(value);
+
+                    case 'object':
+                        // If the type is 'object', we might be dealing with an object or an array or  
+                        // null.  
+                        // Due to a specification blunder in ECMAScript, typeof null is 'object',  
+                        // so watch out for that case.  
+                        if (!value) {
+                            return 'null';
+                        }
+
+                        // Make an array to hold the partial results of stringifying this object value.  
+                        gap += indent;
+                        partial = [];
+
+                        // Is the value an array?  
+                        if (Object.prototype.toString.apply(value) === '[object Array]') {
+                            // The value is an array. Stringify every element. Use null as a placeholder  
+                            // for non-JSON values.  
+
+                            length = value.length;
+                            for (i = 0; i < length; i += 1) {
+                                partial[i] = str(i, value) || 'null';
+                            }
+
+                            // Join all of the elements together, separated with commas, and wrap them in  
+                            // brackets.  
+                            v = partial.length === 0 ? '[]' :
+                    gap ? '[\n' + gap +
+                    partial.join(',\n' + gap) + '\n' +
+                    mind + ']' :
+                    '[' + partial.join(',') + ']';
+                            gap = mind;
+                            return v;
+                        }
+
+                        // Iterate through all of the keys in the object.  
+                        for (k in value) {
+                            if (Object.hasOwnProperty.call(value, k)) {
+                                v = str(k, value);
+                                if (v) {
+                                    partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                                }
+                            }
+                        }
+
+                        // Join all of the member texts together, separated with commas,  
+                        // and wrap them in braces.  
+                        v = partial.length === 0 ? '{}' :
+                gap ? '{\n' + gap + partial.join(',\n' + gap) + '\n' +
+                mind + '}' : '{' + partial.join(',') + '}';
+                        gap = mind;
+                        return v;
+                }
+            };
+
+            // Make a fake root object containing our value under the key of ''.  
+            // Return the result of stringifying the value.  
+            return str('', {
+                '': value
+            });
+        } 
+       
+    </script>
+	</head>
+
+	<body><a href="http://www.ptcheck.com/tea/segment.aspx" target="_blank" id="a_url" style="display:none;" ></a> <input type="hidden" id="danhao" value="2647220997972225" /><div class="mainContainer"><div align="center" class="navigation"><a href="paper_1.htm"><span class="btn_gray">首页</span></a><a  href="paper_2.htm"><span class="btn_gray">上一页</span></a><a href="paper_4.htm"><span class="btn_gray">下一页</span></a><a href="paper_6.htm">	<span class="btn_gray">尾页</span></a><span>页码：3/6页</span></div><div class="zhengwen"><div class="para"><div class="duanluo"><span>169</span></div><div class="l"><span style="margin-left:25px"></span><span >共振峰频率具体值因人而异，与共振腔体器官构造关系密切，因此共振峰也能在一定精度范围内作为声纹特征使用， </span><span >同时这些频点附近的频率蕴含着语音信号的大部分能量，对语音语义的贡献较大。 </span><span >共振峰一般取前三至五个使用。 </span></div><div class="modify" align="right" paraseq="168"><span class="btn btn-blue" onclick="submitPart('共振峰频率具体值因人而异，与共振腔体器官构造关系密切，因此共振峰也能在一定精度范围内作为声纹特征使用，同时这些频点附近的频率蕴含着语音信号的大部分能量，对语音语义的贡献较大。共振峰一般取前三至五个使用。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>170</span></div><div class="l"><span style="margin-left:25px"></span><span >	声道产生元音的原理可以看成是一组串联的谐振器，一个谐振器对应于一个共振峰频率，故元音声道模型可以用一组串联全极点IIR滤波器描述， </span><span >其传输函数可如下表示： </span></div><div class="modify" align="right" paraseq="169"><span class="btn btn-blue" onclick="submitPart('声道产生元音的原理可以看成是一组串联的谐振器，一个谐振器对应于一个共振峰频率，故元音声道模型可以用一组串联全极点IIR滤波器描述，其传输函数可如下表示：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>171</span></div><div class="l"><span style="margin-left:25px"></span><span >                          （4-6） </span></div></div><div class="para"><div class="duanluo"><span>172</span></div><div class="l"><span style="margin-left:25px"></span><a href="../sentence_detail/461.htm" target="right" class="red">辅音部分由并联型零极点IIR滤波器表示，其传输函数如下：</a></div></div><div class="para"><div class="duanluo"><span>173</span></div><div class="l"><span style="margin-left:25px"></span><span >                         （4-7） </span></div></div><div class="para"><div class="duanluo"><span>174</span></div><div class="l"><span style="margin-left:25px"></span><span >	辐射模型 </span></div></div><div class="para"><div class="duanluo"><span>175</span></div><div class="l"><span style="margin-left:25px"></span><span >辐射模型模拟口鼻对所发出的语音信号向外辐射的过程，唇齿结构特征对辐射结果有较大影响。 </span><span >辐射部分用如下所示的一阶差分模型描述： </span></div><div class="modify" align="right" paraseq="174"><span class="btn btn-blue" onclick="submitPart('辐射模型模拟口鼻对所发出的语音信号向外辐射的过程，唇齿结构特征对辐射结果有较大影响。辐射部分用如下所示的一阶差分模型描述：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>176</span></div><div class="l"><span style="margin-left:25px"></span><span >                               （4-8） </span></div></div><div class="para"><div class="duanluo"><span>177</span></div><div class="l"><span style="margin-left:25px"></span><span >	响度补偿基本原理和常见算法 </span></div></div><div class="para"><div class="duanluo"><span>178</span></div><div class="l"><span style="margin-left:25px"></span><span >	响度补偿基本原理 </span></div></div><div class="para"><div class="duanluo"><span>179</span></div><div class="l"><span style="margin-left:25px"></span><span >基于人听觉感知器官的特性，针对同一声压级也即单位面积上能量相同，但是频率不同的声波信号，人最终的主观感觉声强却大不相同。 </span><span >为了合理描述人对声强的感觉特性，人们利用响度表述声音在主观感受上的强弱。 </span><span >同一声压级的声音其响度值大小与声音频率有密切关系，不同频率，人耳所感受到的响度大不相同。 </span><span >国际标准化组织（ISO）通过大量实验研究，总结出在人耳可听频率范围内，声音的声压级单位和响度单位的对应关系——等响曲线[42]，如图4-2所示。 </span><span >响度级的单位为方（phon），从图中可以看出，响度级和声压级以频率为1KHz的声音所产生的感觉级为参考，测量不同频率不同声压级声音所能产生的响度级。 </span><span >可见，在低频处，若要产生与1KHz相对应的感觉级声音，则需较大声压级，即人耳对此低频声信号并不敏感； </span><span >当频率大于500Hz之后，感觉级响度和声压级对应关系相差波动较小，人耳对3000KHz左右的声音感觉最为敏感。 </span></div><div class="modify" align="right" paraseq="178"><span class="btn btn-blue" onclick="submitPart('基于人听觉感知器官的特性，针对同一声压级也即单位面积上能量相同，但是频率不同的声波信号，人最终的主观感觉声强却大不相同。为了合理描述人对声强的感觉特性，人们利用响度表述声音在主观感受上的强弱。同一声压级的声音其响度值大小与声音频率有密切关系，不同频率，人耳所感受到的响度大不相同。国际标准化组织（ISO）通过大量实验研究，总结出在人耳可听频率范围内，声音的声压级单位和响度单位的对应关系——等响曲线[42]，如图4-2所示。响度级的单位为方（phon），从图中可以看出，响度级和声压级以频率为1KHz的声音所产生的感觉级为参考，测量不同频率不同声压级声音所能产生的响度级。可见，在低频处，若要产生与1KHz相对应的感觉级声音，则需较大声压级，即人耳对此低频声信号并不敏感；当频率大于500Hz之后，感觉级响度和声压级对应关系相差波动较小，人耳对3000KHz左右的声音感觉最为敏感。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>180</span></div><div class="l"><span style="margin-left:25px"></span><span >图4-2 ISO-等响曲线 </span></div></div><div class="para"><div class="duanluo"><span>181</span></div><div class="l"><span style="margin-left:25px"></span><span >助听器的核心功能是：根据听障患者听力缺失情况，对外界声音进行合理的补偿，使佩戴者的对输出声音的感觉响度和实际声音的响度大致相同。 </span><a href="../sentence_detail/478.htm" target="right" class="orange">因此，完成此功能的响度补偿算法是助听器系统的核心部分。</a><span >如前所述，听力损失患者在听阈值提高的同时会伴随着痛阈值的下降，其可听范围大大减小。 </span><span >响度补偿算法的首要目的便是将输入声音强度合理的映射为患者可听范围内，让患者首先在响度感觉上听到此声音，因此在响度补偿中动态范围压缩算法必不可少。 </span></div><div class="modify" align="right" paraseq="180"><span class="btn btn-blue" onclick="submitPart('助听器的核心功能是：根据听障患者听力缺失情况，对外界声音进行合理的补偿，使佩戴者的对输出声音的感觉响度和实际声音的响度大致相同。因此，完成此功能的响度补偿算法是助听器系统的核心部分。如前所述，听力损失患者在听阈值提高的同时会伴随着痛阈值的下降，其可听范围大大减小。响度补偿算法的首要目的便是将输入声音强度合理的映射为患者可听范围内，让患者首先在响度感觉上听到此声音，因此在响度补偿中动态范围压缩算法必不可少。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>182</span></div><div class="l"><span style="margin-left:25px"></span><span >单通道的响度补偿在增益计算时，将全频带统一处理，根据各频点的增益插值得到全频域的增益，这样的处理在灵活性和输出语音的舒适度上均有限制。 </span><span >针对单通道的局限性，研究者们将频率划分成多个子带，利用多通道滤波器组完成频带划分， </span><span >并在每个子带内单独进行补偿处理通过多通道划分之后补偿结果的舒适度、可听性和清晰度等都有显著提高[43]。 </span><span >因此，在目前基于多通道的响度补偿方法广泛应用于各类助听器。 </span></div><div class="modify" align="right" paraseq="181"><span class="btn btn-blue" onclick="submitPart('单通道的响度补偿在增益计算时，将全频带统一处理，根据各频点的增益插值得到全频域的增益，这样的处理在灵活性和输出语音的舒适度上均有限制。针对单通道的局限性，研究者们将频率划分成多个子带，利用多通道滤波器组完成频带划分，并在每个子带内单独进行补偿处理通过多通道划分之后补偿结果的舒适度、可听性和清晰度等都有显著提高[43]。因此，在目前基于多通道的响度补偿方法广泛应用于各类助听器。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>183</span></div><div class="l"><span style="margin-left:25px"></span><span >随着响度补偿算法的不断发展，研究者们开始关注听损者频率分辨力上的损失情况。 </span><span >有的患者对高频信号的动态范围已所剩无几甚至基本丧失，那么针对输入信号处在高频段的信息需要进行变换处理，将其搬移至可听频率范围之中， </span><span >这样虽然会使得语音有较大变化，但是对于听损患者而言能听到语音并理解是基本需求。 </span><span >因此，根据听损患者的听力图和频率分辨损失情况针对特定频率段的信号进行搬移，即频谱搬移算法，显得十分必要。 </span></div><div class="modify" align="right" paraseq="182"><span class="btn btn-blue" onclick="submitPart('随着响度补偿算法的不断发展，研究者们开始关注听损者频率分辨力上的损失情况。有的患者对高频信号的动态范围已所剩无几甚至基本丧失，那么针对输入信号处在高频段的信息需要进行变换处理，将其搬移至可听频率范围之中，这样虽然会使得语音有较大变化，但是对于听损患者而言能听到语音并理解是基本需求。因此，根据听损患者的听力图和频率分辨损失情况针对特定频率段的信号进行搬移，即频谱搬移算法，显得十分必要。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>184</span></div><div class="l"><span style="margin-left:25px"></span><span >	宽动态范围压缩（WDRC） </span></div></div><div class="para"><div class="duanluo"><span>185</span></div><div class="l"><span style="margin-left:25px"></span><span >WDRC技术是响度补偿算法的核心部分，宽动态范围压缩算法基于频域分析处理，是一种典型的单通道补偿方法，其具体操作步骤如下[44]： </span></div><div class="modify" align="right" paraseq="184"><span class="btn btn-blue" onclick="submitPart('WDRC技术是响度补偿算法的核心部分，宽动态范围压缩算法基于频域分析处理，是一种典型的单通道补偿方法，其具体操作步骤如下[44]：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>186</span></div><div class="l"><span style="margin-left:25px"></span><span >	将信号变换至频域； </span></div></div><div class="para"><div class="duanluo"><span>187</span></div><div class="l"><span style="margin-left:25px"></span><a href="../sentence_detail/492.htm" target="right" class="orange">	根据听力图和信号特征频率点的声压级计算相应的增益；</a></div></div><div class="para"><div class="duanluo"><span>188</span></div><div class="l"><span style="margin-left:25px"></span><span >	利用线性插值方法得到全频域增益曲线； </span></div></div><div class="para"><div class="duanluo"><span>189</span></div><div class="l"><span style="margin-left:25px"></span><span >	增益补偿之后将信号变换至时域输出。 </span></div></div><div class="para"><div class="duanluo"><span>190</span></div><div class="l"><span style="margin-left:25px"></span><span >如图4-3所示，是某一频点对应的I/O曲线。 </span><span >其中nTHR、nMCL和nUCL分别对应于该频点上正常人的听阈、舒适阈和痛阈值； </span><span >unTHR、unMCL和unUCL分别对应于改频点处听障患者的听阈、舒适阈和痛阈值。 </span><span >WDRC算法根据这些值构建对应关系，将输入信号的声压级对应成图中输出的SPL值，根据输入输出值的差异进行补偿。 </span></div><div class="modify" align="right" paraseq="189"><span class="btn btn-blue" onclick="submitPart('如图4-3所示，是某一频点对应的I/O曲线。其中nTHR、nMCL和nUCL分别对应于该频点上正常人的听阈、舒适阈和痛阈值；unTHR、unMCL和unUCL分别对应于改频点处听障患者的听阈、舒适阈和痛阈值。WDRC算法根据这些值构建对应关系，将输入信号的声压级对应成图中输出的SPL值，根据输入输出值的差异进行补偿。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>191</span></div><div class="l"><span style="margin-left:25px"></span><span >图4-3动态范围压缩I/O曲线 </span></div></div><div class="para"><div class="duanluo"><span>192</span></div><div class="l"><span style="margin-left:25px"></span><span >由上I/O曲线可见，输出补偿增益与输入信号声压级呈分段线性的关系。 </span><span >其输出规律总结如下（输入信号声压级用 表示，输出信号声压级用 表示，增益用 表示）： </span></div><div class="modify" align="right" paraseq="191"><span class="btn btn-blue" onclick="submitPart('由上I/O曲线可见，输出补偿增益与输入信号声压级呈分段线性的关系。其输出规律总结如下（输入信号声压级用 表示，输出信号声压级用 表示，增益用 表示）：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>193</span></div><div class="l"><span style="margin-left:25px"></span><span >	当 ，即当前外界输入信号声压级未达到正常人听阈值时，系统默认不使用任何补偿方式，即该I/O曲线输出增益 ； </span></div><div class="modify" align="right" paraseq="192"><span class="btn btn-blue" onclick="submitPart('当 ，即当前外界输入信号声压级未达到正常人听阈值时，系统默认不使用任何补偿方式，即该I/O曲线输出增益 ；',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>194</span></div><div class="l"><span style="margin-left:25px"></span><span >	当 时，输出信号声压级 ，即如图4-3中（ ， ）所对应直线段，此时算法根据I/O曲线中的对应关系，对输入信号进行增益补偿输出， </span><span >输出增益 （单位为dB SPL），一般而言此段增益大于零； </span></div><div class="modify" align="right" paraseq="193"><span class="btn btn-blue" onclick="submitPart('当 时，输出信号声压级 ，即如图4-3中（ ， ）所对应直线段，此时算法根据I/O曲线中的对应关系，对输入信号进行增益补偿输出，输出增益 （单位为dB SPL），一般而言此段增益大于零；',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>195</span></div><div class="l"><span style="margin-left:25px"></span><span >	当 时，输出信号声压级 ，如图中（ ， ）所示，可见I/O曲线将声压级处在正常人的舒适阈至痛阈范围内的声信号，映射至听障患者舒适阈至痛阈范围， </span><span >此段变换效果中，既有对输入信号进行补偿的部分，也有对输入信号进行限幅衰减的部分，因为，一般而言听障患者会伴有痛阈值的下降，即在此段计算出的 ， </span><span >或大于零，或小于零； </span></div><div class="modify" align="right" paraseq="194"><span class="btn btn-blue" onclick="submitPart('当 时，输出信号声压级 ，如图中（ ， ）所示，可见I/O曲线将声压级处在正常人的舒适阈至痛阈范围内的声信号，映射至听障患者舒适阈至痛阈范围，此段变换效果中，既有对输入信号进行补偿的部分，也有对输入信号进行限幅衰减的部分，因为，一般而言听障患者会伴有痛阈值的下降，即在此段计算出的 ，或大于零，或小于零；',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>196</span></div><div class="l"><span style="margin-left:25px"></span><span >	当 后，I/O曲线输出开始保持为听障患者的痛阈值 ，即 ，避免过幅声信号对助听器佩戴者造成伤害，起到一定的限幅效果，此时增益 小于零。 </span></div><div class="modify" align="right" paraseq="195"><span class="btn btn-blue" onclick="submitPart('当 后，I/O曲线输出开始保持为听障患者的痛阈值 ，即 ，避免过幅声信号对助听器佩戴者造成伤害，起到一定的限幅效果，此时增益 小于零。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>197</span></div><div class="l"><span style="margin-left:25px"></span><span >上述增益曲线是针对某一特征频点所构建而得，通过计算所有特征频点的I/O曲线，得到对应频点、声压级所对应的增益值，通过插值的方式获得全频域的增益因子， </span><span >由此对输入信号进行补偿输出，这边是WDRC的基本思路。 </span></div><div class="modify" align="right" paraseq="196"><span class="btn btn-blue" onclick="submitPart('上述增益曲线是针对某一特征频点所构建而得，通过计算所有特征频点的I/O曲线，得到对应频点、声压级所对应的增益值，通过插值的方式获得全频域的增益因子，由此对输入信号进行补偿输出，这边是WDRC的基本思路。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>198</span></div><div class="l"><span style="margin-left:25px"></span><span >WDRC算法合理利用听障患者剩余的听力范围，使其可以得到在声压级上更为合理舒适的声信号，然而实际使用发现该算法处理后的语音舒适度非常低， </span><span >达不到使患者满意的效果，究其原因，WDRC算法将全频域作为一个整体通道进行处理，对实际语音的频率成分分析不够，使得输出信号可听性过低。 </span><span >后述多通道响度补偿算法正是针对WDRC算法的痛点进行处理，获得不错的补偿效果。 </span><span >因此，WDRC算法一般而言与多通道响度补偿算法结合使用达到较好的响度补偿效果。 </span></div><div class="modify" align="right" paraseq="197"><span class="btn btn-blue" onclick="submitPart('WDRC算法合理利用听障患者剩余的听力范围，使其可以得到在声压级上更为合理舒适的声信号，然而实际使用发现该算法处理后的语音舒适度非常低，达不到使患者满意的效果，究其原因，WDRC算法将全频域作为一个整体通道进行处理，对实际语音的频率成分分析不够，使得输出信号可听性过低。后述多通道响度补偿算法正是针对WDRC算法的痛点进行处理，获得不错的补偿效果。因此，WDRC算法一般而言与多通道响度补偿算法结合使用达到较好的响度补偿效果。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>199</span></div><div class="l"><span style="margin-left:25px"></span><span >	多通道响度补偿算法 </span></div></div><div class="para"><div class="duanluo"><span>200</span></div><div class="l"><span style="margin-left:25px"></span><span >针对上述基于单通道的WDRC算法的不足，研究者们通过细分频带范围的思路对其进行改进，引入频带分解的思想，将全部可听频带划分为多个通道， </span><span >分别进行响度补偿。 </span><span >每个子带内使用的补偿算法可以是简单的WDRC处理，也可以根据患者的先验信息进行其他更有针对性的响度补偿策略。 </span><span >多通道补偿思路使得算法的灵活性大大增加，在提升算法性能的同时也可以针对患者的实际听损情况，比如频率分辨缺失情况，实现更人性化的补偿方案， </span><span >较好的改善输出语音信号的舒适度，提供佩戴者使用体验。 </span></div><div class="modify" align="right" paraseq="199"><span class="btn btn-blue" onclick="submitPart('针对上述基于单通道的WDRC算法的不足，研究者们通过细分频带范围的思路对其进行改进，引入频带分解的思想，将全部可听频带划分为多个通道，分别进行响度补偿。每个子带内使用的补偿算法可以是简单的WDRC处理，也可以根据患者的先验信息进行其他更有针对性的响度补偿策略。多通道补偿思路使得算法的灵活性大大增加，在提升算法性能的同时也可以针对患者的实际听损情况，比如频率分辨缺失情况，实现更人性化的补偿方案，较好的改善输出语音信号的舒适度，提供佩戴者使用体验。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>201</span></div><div class="l"><span style="margin-left:25px"></span><a href="../sentence_detail/521.htm" target="right" class="orange">多通道响度补偿算法首先利用滤波器组将输入信号划分为多个子带，而后对针对子带进行响度补偿，最后将各子带信号合并输出[43]，算法主要流程如下图所示：</a></div><div class="modify" align="right" paraseq="200"><span class="btn btn-blue" onclick="submitPart('多通道响度补偿算法首先利用滤波器组将输入信号划分为多个子带，而后对针对子带进行响度补偿，最后将各子带信号合并输出[43]，算法主要流程如下图所示：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>202</span></div><div class="l"><span style="margin-left:25px"></span><span >图4-4多通道响度补偿流程 </span></div></div><div class="para"><div class="duanluo"><span>203</span></div><div class="l"><span style="margin-left:25px"></span><span >由图4-4可见，多通道处理算法首先需要一组用于分解信号和综合处理后的子带信号的滤波器组； </span><span >另外一个核心便是每个子带进行子带补偿的算法。 </span><span >因此，针对多通道响度补偿的研究大都针对于频带划分方式以及如何在各子带内进行补偿处理。 </span><span >滤波器参数可提前设定，如果子带补偿中不涉及频域处理，那么多通道响度补偿算法主要运行在时域，算法计算量小，非常适合移动便携设备上运行。 </span></div><div class="modify" align="right" paraseq="202"><span class="btn btn-blue" onclick="submitPart('由图4-4可见，多通道处理算法首先需要一组用于分解信号和综合处理后的子带信号的滤波器组；另外一个核心便是每个子带进行子带补偿的算法。因此，针对多通道响度补偿的研究大都针对于频带划分方式以及如何在各子带内进行补偿处理。滤波器参数可提前设定，如果子带补偿中不涉及频域处理，那么多通道响度补偿算法主要运行在时域，算法计算量小，非常适合移动便携设备上运行。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>204</span></div><div class="l"><span style="margin-left:25px"></span><span >诚然，多通道处理思路是的补偿算法更加灵活有效，但也带来了新的问题。 </span><span >研究表明，多通道处理方式的效果与频带划分方式息息相关。 </span><span >各子带划分会使得相邻两子带边界频点最终获得增益不一致。 </span><span >如果分界频率恰好处在某一共振峰附近，那么该算法极有可能会使得语音共振峰被分割。 </span><span >共振峰的损坏将使得输出语音可懂度极度下降。因此，实际使用的多通道补偿算法需要改进。 </span></div><div class="modify" align="right" paraseq="203"><span class="btn btn-blue" onclick="submitPart('诚然，多通道处理思路是的补偿算法更加灵活有效，但也带来了新的问题。研究表明，多通道处理方式的效果与频带划分方式息息相关。各子带划分会使得相邻两子带边界频点最终获得增益不一致。如果分界频率恰好处在某一共振峰附近，那么该算法极有可能会使得语音共振峰被分割。共振峰的损坏将使得输出语音可懂度极度下降。因此，实际使用的多通道补偿算法需要改进。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>205</span></div><div class="l"><span style="margin-left:25px"></span><span >	基于共振峰的谱对比增强响度补偿算法 </span></div></div><div class="para"><div class="duanluo"><span>206</span></div><div class="l"><span style="margin-left:25px"></span><span >在语音信号处理当中，共振峰特征应用广泛，其蕴含着原始语音的语义信息。 </span><span >从语音信号数字模型角度出发，共振峰即是描述声道腔共振特性的基本参数。 </span><span >说话人语义信息对提高耳聋患者的言语识别率有关键作用，因此语音信号中共振峰特性对提高语音补偿效果具有重要意义。 </span><span >传统多通道响度补偿、宽动态范围压缩等均未考虑语音共振峰特性，容易产生劈峰，虚假共振峰等情况，对共振峰造成破坏，导致语音可懂度、清晰度严重下降[46]。 </span><span >通过共振峰检测等方式对共振峰频率处信号进行保护，避免破坏语音信号的清晰度和可懂度[46]，使得补偿后语音可懂度等有所提升。 </span><span >但是在噪声情况下，仅仅保留共振峰信号的完整性不足以提高整体含噪语音的清晰度或可懂程度。 </span></div><div class="modify" align="right" paraseq="205"><span class="btn btn-blue" onclick="submitPart('在语音信号处理当中，共振峰特征应用广泛，其蕴含着原始语音的语义信息。从语音信号数字模型角度出发，共振峰即是描述声道腔共振特性的基本参数。说话人语义信息对提高耳聋患者的言语识别率有关键作用，因此语音信号中共振峰特性对提高语音补偿效果具有重要意义。传统多通道响度补偿、宽动态范围压缩等均未考虑语音共振峰特性，容易产生劈峰，虚假共振峰等情况，对共振峰造成破坏，导致语音可懂度、清晰度严重下降[46]。通过共振峰检测等方式对共振峰频率处信号进行保护，避免破坏语音信号的清晰度和可懂度[46]，使得补偿后语音可懂度等有所提升。但是在噪声情况下，仅仅保留共振峰信号的完整性不足以提高整体含噪语音的清晰度或可懂程度。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>207</span></div><div class="l"><span style="margin-left:25px"></span><span >本文基于共振峰优化思想以及其重要意义，以及以上算法对含噪情况表现的不足，将谱对比增强引入响度补偿之中，提出一种基于共振峰谱增强方式的响度补偿处理算法。 </span><span >谱对比增强可以提高含噪语音信号的清晰度[]。一般的谱增强处理可能会产生虚假共振峰。 </span><span >通过在谱增强处理中以共振峰所在频率为中心增强其频带内信号，同时适当抑制共振峰带外信号，提高语谱对比度，使得语音信号清晰度得到提升。 </span><span >同时，处理也完整的保护并加强共振峰信息，使得处理后语音可懂度有所提升。 </span></div><div class="modify" align="right" paraseq="206"><span class="btn btn-blue" onclick="submitPart('本文基于共振峰优化思想以及其重要意义，以及以上算法对含噪情况表现的不足，将谱对比增强引入响度补偿之中，提出一种基于共振峰谱增强方式的响度补偿处理算法。谱对比增强可以提高含噪语音信号的清晰度[]。一般的谱增强处理可能会产生虚假共振峰。通过在谱增强处理中以共振峰所在频率为中心增强其频带内信号，同时适当抑制共振峰带外信号，提高语谱对比度，使得语音信号清晰度得到提升。同时，处理也完整的保护并加强共振峰信息，使得处理后语音可懂度有所提升。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>208</span></div><div class="l"><span style="margin-left:25px"></span><span >	共振峰 </span></div></div><div class="para"><div class="duanluo"><span>209</span></div><div class="l"><span style="margin-left:25px"></span><a href="../sentence_detail/544.htm" target="right" class="orange">语音信号产生数字模型的第二部分——声道模型描述语音发声腔体特性。</a><span >由喉、鼻、口腔等构成的声腔对从声带等激励部分发出的声音会在特定频率处产生共鸣效果，即发生共振[47]。 </span><span >共振发生的频率因人而异，同时同一人的声腔会在多个频率处产生共振效应，而人主动改变声腔形状也会使得共振的频率产生变化。 </span><span >将共振频率从小到大排列分别称为第一共振峰、第二共振峰&hellip;一般取前3至5个共振峰作为特征参数。 </span><span >从共振峰产生过程可以看出，一帧语音信号共振峰频率与该帧语音信号产生时共振腔（声道腔）特性密不可分，对语音产生和语义生成有重要意义。 </span><span >因此，共振峰合成技术常用于语音合成。 </span></div><div class="modify" align="right" paraseq="208"><span class="btn btn-blue" onclick="submitPart('语音信号产生数字模型的第二部分——声道模型描述语音发声腔体特性。由喉、鼻、口腔等构成的声腔对从声带等激励部分发出的声音会在特定频率处产生共鸣效果，即发生共振[47]。共振发生的频率因人而异，同时同一人的声腔会在多个频率处产生共振效应，而人主动改变声腔形状也会使得共振的频率产生变化。将共振频率从小到大排列分别称为第一共振峰、第二共振峰&hellip;一般取前3至5个共振峰作为特征参数。从共振峰产生过程可以看出，一帧语音信号共振峰频率与该帧语音信号产生时共振腔（声道腔）特性密不可分，对语音产生和语义生成有重要意义。因此，共振峰合成技术常用于语音合成。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>210</span></div><div class="l"><span style="margin-left:25px"></span><span >共振峰提取主要有谱包络检测法、倒谱法和线性预测（LPC）法等，其中谱包络法运算量最小，效果最差； </span><a href="../sentence_detail/551.htm" target="right" class="orange">而倒谱法运算量较大，故本文采用LPC法提取共振峰参数。</a></div><div class="modify" align="right" paraseq="209"><span class="btn btn-blue" onclick="submitPart('共振峰提取主要有谱包络检测法、倒谱法和线性预测（LPC）法等，其中谱包络法运算量最小，效果最差；而倒谱法运算量较大，故本文采用LPC法提取共振峰参数。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>211</span></div><div class="l"><span style="margin-left:25px"></span><a href="../sentence_detail/552.htm" target="right" class="orange">线性预测基本思路是利用当前样点的前 个样点预测当前样点，即：</a></div></div><div class="para"><div class="duanluo"><span>212</span></div><div class="l"><span style="margin-left:25px"></span><span >                              （4-10） </span></div></div><div class="para"><div class="duanluo"><span>213</span></div><div class="l"><span style="margin-left:25px"></span><span >式中 表示信号样点， 为线性预测系数。则预测误差可如下表示： </span></div></div><div class="para"><div class="duanluo"><span>214</span></div><div class="l"><span style="margin-left:25px"></span><span >                 （4-11） </span></div></div><div class="para"><div class="duanluo"><span>215</span></div><div class="l"><span style="margin-left:25px"></span><span >求解 ，即求解使得 最小的一组线性预测系数 即可得到相应AR模型。 </span><span >根据模型系数可得其传递函数 ： </span></div><div class="modify" align="right" paraseq="214"><span class="btn btn-blue" onclick="submitPart('求解 ，即求解使得 最小的一组线性预测系数 即可得到相应AR模型。根据模型系数可得其传递函数 ：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>216</span></div><div class="l"><span style="margin-left:25px"></span><span >                                （4-12） </span></div></div><div class="para"><div class="duanluo"><span>217</span></div><div class="l"><span style="margin-left:25px"></span><span >其中 是预测模型阶数， 是增益常数。 又可以表示为 个极点级联的形式： </span></div><div class="modify" align="right" paraseq="216"><span class="btn btn-blue" onclick="submitPart('其中 是预测模型阶数， 是增益常数。 又可以表示为 个极点级联的形式：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>218</span></div><div class="l"><span style="margin-left:25px"></span><span >                               （4-13） </span></div></div><div class="para"><div class="duanluo"><span>219</span></div><div class="l"><span style="margin-left:25px"></span><a href="../sentence_detail/561.htm" target="right" class="orange">式中 ， 极点对应的共振峰频率即为 ，其中 为采样周期。</a><span >实际提取中常使用峰值检测的方法获取共振峰频率，LPC共振峰检测处理框图如下所示: </span></div><div class="modify" align="right" paraseq="218"><span class="btn btn-blue" onclick="submitPart('式中 ， 极点对应的共振峰频率即为 ，其中 为采样周期。实际提取中常使用峰值检测的方法获取共振峰频率，LPC共振峰检测处理框图如下所示:',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>220</span></div><div class="l"><span style="margin-left:25px"></span><span >图4-6 LPC共振峰检测原理 </span></div></div><div class="para"><div class="duanluo"><span>221</span></div><div class="l"><span style="margin-left:25px"></span><span >图4-7为两例语音帧LPC预测分析结果对比： </span></div></div><div class="para"><div class="duanluo"><span>222</span></div><div class="l"><span style="margin-left:25px"></span><span >图4-7 LPC预测结果对比 </span></div></div><div class="para"><div class="duanluo"><span>223</span></div><div class="l"><span style="margin-left:25px"></span><span >LPC谱包络中可以明显地看出共振峰信息，同时可以发现，由于增益G的存在，LPC谱和信号频谱间在元音和辅音间相差不同，但可以证明该差值均为常数。 </span></div><div class="modify" align="right" paraseq="222"><span class="btn btn-blue" onclick="submitPart('LPC谱包络中可以明显地看出共振峰信息，同时可以发现，由于增益G的存在，LPC谱和信号频谱间在元音和辅音间相差不同，但可以证明该差值均为常数。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>224</span></div><div class="l"><span style="margin-left:25px"></span><span >通过获取对应帧语音信号共振峰信息，可指导该帧后续处理中针对共振峰频率处进行特别处理，降低处理带来的语音失真同时探寻提升语音清晰度可懂度的处理方式。 </span></div><div class="modify" align="right" paraseq="223"><span class="btn btn-blue" onclick="submitPart('通过获取对应帧语音信号共振峰信息，可指导该帧后续处理中针对共振峰频率处进行特别处理，降低处理带来的语音失真同时探寻提升语音清晰度可懂度的处理方式。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>225</span></div><div class="l"><span style="margin-left:25px"></span><span >	谱对比增强 </span></div></div><div class="para"><div class="duanluo"><span>226</span></div><div class="l"><span style="margin-left:25px"></span><span >在日常生活中，语音聆听过程常伴随许多背景噪声，使得听清目标的难度增大，对听障患者而言，对背景复杂的聆听环境显得更加力不从心。 </span><span >助听器普遍采用的处理方式是，选取合适的降噪算法降低背景噪声的能量，提高信噪比。 </span><span >通过降噪处理之后，语音的清晰度有较好的提升。 </span><span >但是，降噪一般只针对如何将信号中的噪声部分剔除以提高信噪比，并未直接针对如何提高语音信号清晰度进行处理。 </span><span >谱对比增强的思想是在基本降噪处理的基础上，对信号频谱进行处理，提高频谱对比度。 </span><span >研究表明[48]，谱对比增强可以提高耳蜗植入患者噪声环境下语音的可懂度。 </span><span >一般而言，听损患者需要更强的谱对比度以提高噪声环境下的言语识别率。 </span></div><div class="modify" align="right" paraseq="225"><span class="btn btn-blue" onclick="submitPart('在日常生活中，语音聆听过程常伴随许多背景噪声，使得听清目标的难度增大，对听障患者而言，对背景复杂的聆听环境显得更加力不从心。助听器普遍采用的处理方式是，选取合适的降噪算法降低背景噪声的能量，提高信噪比。通过降噪处理之后，语音的清晰度有较好的提升。但是，降噪一般只针对如何将信号中的噪声部分剔除以提高信噪比，并未直接针对如何提高语音信号清晰度进行处理。谱对比增强的思想是在基本降噪处理的基础上，对信号频谱进行处理，提高频谱对比度。研究表明[48]，谱对比增强可以提高耳蜗植入患者噪声环境下语音的可懂度。一般而言，听损患者需要更强的谱对比度以提高噪声环境下的言语识别率。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>227</span></div><div class="l"><span style="margin-left:25px"></span><span >谱对比增强处理保持频谱波形的峰值并拉低频谱波形的谷值，使波峰与波谷对比更加明显，算法具体处理步骤如下： </span></div><div class="modify" align="right" paraseq="226"><span class="btn btn-blue" onclick="submitPart('谱对比增强处理保持频谱波形的峰值并拉低频谱波形的谷值，使波峰与波谷对比更加明显，算法具体处理步骤如下：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>228</span></div><div class="l"><span style="margin-left:25px"></span><span >	对待处理帧进行FFT，并将其转换成对数谱 ； </span></div></div><div class="para"><div class="duanluo"><span>229</span></div><div class="l"><span style="margin-left:25px"></span><span >	寻找对数谱 的峰值序列 和谷值序列 ； </span></div></div><div class="para"><div class="duanluo"><span>230</span></div><div class="l"><span style="margin-left:25px"></span><span >	对于频谱上任意一点 ，确定其所在线段的峰值 和谷值 ，计算峰谷值差 ； </span></div><div class="modify" align="right" paraseq="229"><span class="btn btn-blue" onclick="submitPart('对于频谱上任意一点 ，确定其所在线段的峰值 和谷值 ，计算峰谷值差 ；',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>231</span></div><div class="l"><span style="margin-left:25px"></span><span >	确立增强处理后新的峰谷值差 ，其中 是增强算法程度控制因子，取值一般为0到1之间，取0即代表无增强效应； </span></div><div class="modify" align="right" paraseq="230"><span class="btn btn-blue" onclick="submitPart('确立增强处理后新的峰谷值差 ，其中 是增强算法程度控制因子，取值一般为0到1之间，取0即代表无增强效应；',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>232</span></div><div class="l"><span style="margin-left:25px"></span><span >	增强后谱序列各点值由如下公式算得： </span></div></div><div class="para"><div class="duanluo"><span>233</span></div><div class="l"><span style="margin-left:25px"></span><span >              （4-14） </span></div></div><div class="para"><div class="duanluo"><span>234</span></div><div class="l"><span style="margin-left:25px"></span><span >谱对比增强算法流程图如下： </span></div></div><div class="para"><div class="duanluo"><span>235</span></div><div class="l"><span style="margin-left:25px"></span><span >图4-8谱对比增强处理流程 </span></div></div><div class="para"><div class="duanluo"><span>236</span></div><div class="l"><span style="margin-left:25px"></span><span >处理算法中关键部分是利用峰谷值和调节参数对原频谱进行变换，处理细节如上步骤所述。 </span><span >下图为一帧语音增强前后频谱对比: </span></div><div class="modify" align="right" paraseq="235"><span class="btn btn-blue" onclick="submitPart('处理算法中关键部分是利用峰谷值和调节参数对原频谱进行变换，处理细节如上步骤所述。下图为一帧语音增强前后频谱对比:',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>237</span></div><div class="l"><span style="margin-left:25px"></span><span >图4-9谱对比增强前后频谱对比 </span></div></div><div class="para"><div class="duanluo"><span>238</span></div><div class="l"><span style="margin-left:25px"></span><span >经过对比增强处理后频谱波谷更加深，频谱峰值保持不变，相邻峰谷值之间的值按比例对应于新的峰谷值间。 </span><span >处理后，频谱动态范围扩大，对微弱噪声有一定的抑制效果，而尽可能的原始语音的增大动态范围对听力动态范围所剩不多的听障患者而言是有好处的。 </span><span >因为，动态范围广的信号在经过WDRC处理后的剩余动态范围相对更宽泛，表现为语音在响度上更加容易分辨，因此， </span><span >谱对比增强处理对提高语音清晰度和可懂度有一定的帮助。 </span></div><div class="modify" align="right" paraseq="237"><span class="btn btn-blue" onclick="submitPart('经过对比增强处理后频谱波谷更加深，频谱峰值保持不变，相邻峰谷值之间的值按比例对应于新的峰谷值间。处理后，频谱动态范围扩大，对微弱噪声有一定的抑制效果，而尽可能的原始语音的增大动态范围对听力动态范围所剩不多的听障患者而言是有好处的。因为，动态范围广的信号在经过WDRC处理后的剩余动态范围相对更宽泛，表现为语音在响度上更加容易分辨，因此，谱对比增强处理对提高语音清晰度和可懂度有一定的帮助。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>239</span></div><div class="l"><span style="margin-left:25px"></span><span >	处方公式及I/O曲线 </span></div></div><div class="para"><div class="duanluo"><span>240</span></div><div class="l"><span style="margin-left:25px"></span><span >处方公式帮助听力师选配助听器，常被用于计算补偿增益。 </span><span >它依据患者各特征频点处听阈参数，计算所需增益（被称为目标放大量）。 </span><span >这些增益参数常用于指导助听器对输出语音进行相应补偿得到输出语音，因此，处方公式对助听器计算患者对应I/O曲线有直接影响，是助听器补偿功能的核心单元。 </span></div><div class="modify" align="right" paraseq="239"><span class="btn btn-blue" onclick="submitPart('处方公式帮助听力师选配助听器，常被用于计算补偿增益。它依据患者各特征频点处听阈参数，计算所需增益（被称为目标放大量）。这些增益参数常用于指导助听器对输出语音进行相应补偿得到输出语音，因此，处方公式对助听器计算患者对应I/O曲线有直接影响，是助听器补偿功能的核心单元。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>241</span></div><div class="l"><span style="margin-left:25px"></span><span >早在1935年， </span><span >Knudsen和Jones所使用的镜像听力图法处理听损和增益间关系便是一种处方公式的应用， </span><span >他们简单的将1dB听损对应需要1dB的增益以达到补偿效果[49]； </span><span >1940年Watson和Knudsen开始基于患者舒适阈值(MCL)寻求补偿增益计算方法[50]； </span><span >1944年Lybarger提出了基于MCL的&quot;1/2增益原则&rdquo;[51]； </span><span >此后，大量针对不同特性需求的处方公式被提出，大部分处方公式也均已写入各商用助听器软件中。 </span><span >根据处方公式增益计算方法不同，可分为线性处方公式和非线性处方公式。 </span></div><div class="modify" align="right" paraseq="240"><span class="btn btn-blue" onclick="submitPart('早在1935年，Knudsen和Jones所使用的镜像听力图法处理听损和增益间关系便是一种处方公式的应用，他们简单的将1dB听损对应需要1dB的增益以达到补偿效果[49]；1940年Watson和Knudsen开始基于患者舒适阈值(MCL)寻求补偿增益计算方法[50]；1944年Lybarger提出了基于MCL的&quot;1/2增益原则&rdquo;[51]；此后，大量针对不同特性需求的处方公式被提出，大部分处方公式也均已写入各商用助听器软件中。根据处方公式增益计算方法不同，可分为线性处方公式和非线性处方公式。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>242</span></div><div class="l"><span style="margin-left:25px"></span><span >线性处方公式给出增益值基本为固定计算值，并不考虑输入声压级大小影响。 </span><span >线性处方公式有：1/2增益、Libby、Lybarger、Skinner、Pogo II、Berger、NAL-R和理想感觉级(DSL)等， </span><span >常用的线性处方公式简单说明如下： </span></div><div class="modify" align="right" paraseq="241"><span class="btn btn-blue" onclick="submitPart('线性处方公式给出增益值基本为固定计算值，并不考虑输入声压级大小影响。线性处方公式有：1/2增益、Libby、Lybarger、Skinner、Pogo II、Berger、NAL-R和理想感觉级(DSL)等，常用的线性处方公式简单说明如下：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>243</span></div><div class="l"><span style="margin-left:25px"></span><span >	1/2增益公式：核心思想是助听器输出语音达到最适阈所需增益等于纯音听阈值的1/2，同时增加有10~15dB的保留增益，适于佩戴过助听器患者使用； </span></div><div class="modify" align="right" paraseq="242"><span class="btn btn-blue" onclick="submitPart('1/2增益公式：核心思想是助听器输出语音达到最适阈所需增益等于纯音听阈值的1/2，同时增加有10~15dB的保留增益，适于佩戴过助听器患者使用；',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>244</span></div><div class="l"><span style="margin-left:25px"></span><span >	Libby公式：将1/2增益改为1/3，即取听阈值1/3作为增益，并将250Hz和500Hz频率处增益分别减去5dB和3dB，适于首次佩戴者； </span></div><div class="modify" align="right" paraseq="243"><span class="btn btn-blue" onclick="submitPart('Libby公式：将1/2增益改为1/3，即取听阈值1/3作为增益，并将250Hz和500Hz频率处增益分别减去5dB和3dB，适于首次佩戴者；',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>245</span></div><div class="l"><span style="margin-left:25px"></span><span >	Pogo II公式：原始Pogo公式在1/2增益公式的基础上对低频分量添加消减因子，以提高言语理解能力； </span><span >Pogo II公式在其基础上针对严重听损情况（&gt;65dB），增益中增加高于65dB部分的一半作为附加增益； </span></div><div class="modify" align="right" paraseq="244"><span class="btn btn-blue" onclick="submitPart('Pogo II公式：原始Pogo公式在1/2增益公式的基础上对低频分量添加消减因子，以提高言语理解能力；Pogo II公式在其基础上针对严重听损情况（&gt;65dB），增益中增加高于65dB部分的一半作为附加增益；',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>246</span></div><div class="l"><span style="margin-left:25px"></span><span >	NAL-R(National Acoustic Laboratories Revised)公式[52]：NAL-R于1986年由Byrne &amp; Dillon提出， </span><span >它是基于NAL公式的修正版本，针对言语频率，尤其是500Hz ~ 1000Hz频带内的听损，其所需提供的能量更加优化精细，并使用1/3增益原则， </span><span >其具体计算步骤如下： </span></div><div class="modify" align="right" paraseq="245"><span class="btn btn-blue" onclick="submitPart('NAL-R(National Acoustic Laboratories Revised)公式[52]：NAL-R于1986年由Byrne &amp; Dillon提出，它是基于NAL公式的修正版本，针对言语频率，尤其是500Hz ~ 1000Hz频带内的听损，其所需提供的能量更加优化精细，并使用1/3增益原则，其具体计算步骤如下：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>247</span></div><div class="l"><span style="margin-left:25px"></span><span >                 （4-15） </span></div></div><div class="para"><div class="duanluo"><span>248</span></div><div class="l"><span style="margin-left:25px"></span><span >其中 分别为500Hz，1000Hz和2000Hz处的听阈值， 为修正因子值如下： </span></div><div class="modify" align="right" paraseq="247"><span class="btn btn-blue" onclick="submitPart('其中 分别为500Hz，1000Hz和2000Hz处的听阈值， 为修正因子值如下：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>249</span></div><div class="l"><span style="margin-left:25px"></span><span >表4- 1修正因子值 </span></div></div><div class="para"><div class="duanluo"><span>250</span></div><div class="l"><span style="margin-left:25px"></span><a href="../sentence_detail/616.htm" target="right" class="red">频率（Hz）	250	500	1000	1500	2000	3000	4000	6000</a></div><div class="modify" align="right" paraseq="249"><span class="btn btn-blue" onclick="submitPart('频率（Hz）	250	500	1000	1500	2000	3000	4000	6000',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>251</span></div><div class="l"><span style="margin-left:25px"></span><span > (dB) </span></div></div><div class="para"><div class="duanluo"><span>252</span></div><div class="l"><span style="margin-left:25px"></span><span >-17	-8	1	1	-1	-2	-2	-2 </span></div></div><div align="center" class="navigation"><a href="paper_1.htm"><span class="btn_gray">首页</span></a><a  href="paper_2.htm"><span class="btn_gray">上一页</span></a><a href="paper_4.htm"><span class="btn_gray">下一页</span></a><a href="paper_6.htm">	<span class="btn_gray">尾页</span></a><span>页码：3/6页</span></div><div class="footer"><div align="center" class="a666" style="font-size:14px;padding-top:50px;padding-bottom:30px;"><div>检测报告由 <a class="nounderline" href="http://www.ptcheck.com" target="_blank">PTcheck</a>文献相似度检测系统生成 </div><div>Copyright © 2007-2016 PTcheck </div></div></div></div></body></html>

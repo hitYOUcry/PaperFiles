@@ -1,0 +1,446 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>PTcheck论文检测报告</title>
+		<link rel="stylesheet" href="../css/base.css" />
+		<style type="text/css">
+		a {
+    color: #0796fe;
+}
+a:hover{
+    color:#0796fe!important;
+}
+			.mainContainer {
+				padding: 20px;
+	
+			}
+			
+			.navigation span {
+				display: inline-block;
+				padding-left: 5px;
+				padding-right: 5px;
+				color: #666;
+			}
+			
+			.btn_gray {
+				border: solid 1px #dddddd;
+				background-color: #eeeeee;
+				border-radius: 5px;
+				cursor: pointer;
+			}
+			
+			.btn_gray:hover,
+			.btn_blue {
+				background-color: #0099ff;
+				border: solid 1px #0099ff;
+				color: #fff!important;
+				border-radius: 5px;
+				cursor: pointer;
+			}
+			.para{
+				padding-top:20px;
+			}
+			
+			.duanluo{
+				padding-left:20px;
+				
+				padding-bottom: 5px;
+			}
+			.duanluo span{
+				display: inline-block;
+				padding-left:5px;
+				padding-right: 5px;
+				border: solid 1px #999;
+				color:#999;
+			}
+			.l{
+				line-height: 20px;
+				padding-bottom: 5px;
+			}
+			.l span{
+				color:#333;
+			}
+			.mymodify{
+				font-size:12px;
+			}
+			.mymodify textarea{
+				width:98%;
+				height:100px;
+				color:#333;
+				clear:both;
+			}
+			textarea{
+				padding:10px;
+				line-height: 20px;
+			}
+		</style>
+		<script type="text/javascript">
+
+        var isstorage=false;
+        var danhao;
+        var result= new Array();
+         function trimStr(str) {
+
+            if ((typeof (str) != "string") || !str) {
+
+                return "";
+
+            }
+
+            return str.replace(/(^\s*)|(\s*$)/g, "");
+
+        }
+          
+        function myclick() {
+            window.parent.parent.ViewMain.window.location.href = "../../htmls/jianchong_.htm";
+        }
+        function submitPart(obj, target) {
+            var parent = target.parentNode;
+            if(parent.getAttribute("data")=="add"){
+              var mynext = parent.nextSibling;
+              parent.setAttribute("data","remove");
+              parent.parentNode.removeChild(mynext);
+            }
+            else{
+            	parent.setAttribute("data","add");
+            	var temphtml = document.createElement("div");
+                temphtml.innerHTML = "<input type=\"hidden\" value=\""+ parent.getAttribute("paraseq") +"\"><div name=\"mymodify\" class=\"mymodify\" >"
+					+"<div class=\"a999\">改重内容（请对本句修改之后，点击“临时保存”，然后进入报告左侧“修改文档”页面中获取修改后的内容）：</div>"
+					+"<div><textarea>"+obj
+					+"</textarea>"
+					+"</div>"
+					+"<div align=\"right\" class=\"a999\" style=\"margin-top:14px;\">（注意：改完请及时到“修改文档”复制到原文）<span class=\"btn-gray btn a333\" onclick=\"mysave(this)\">临时保存</span></div>"
+				+"</div>";
+            	   parent.parentNode.insertBefore(temphtml, null);
+            }
+
+        }
+
+		function myNavigate(){
+		 document.getElementById("a_url").click();
+		}
+       
+        function mysave(target) {
+            var tempsen = trimStr(target.parentNode.previousSibling.lastChild.value.replace(/\"/g,"\\\"").replace(/\'/g,"\\\'"));
+            var paraseq = target.parentNode.parentNode.parentNode.firstChild.value;            
+            var mydiv = target.parentNode.parentNode.parentNode.previousSibling;
+             if (mydiv.nodeName == "#text") {
+                mydiv = mydiv.previousSibling;
+            }
+             
+            mydiv.lastChild.setAttribute("onclick", "submitPart('" + tempsen + "',this)");
+           mydiv.setAttribute("data","remove");
+           if (mydiv.firstChild.innerHTML != "已修改") {
+                var xiugai = document.createElement("span");
+                xiugai.setAttribute("style", "font-size:12px;color:#00AEAE;margin-right:10px;");
+                xiugai.innerHTML = "已修改";
+                mydiv.insertBefore(xiugai, mydiv.lastChild);
+               }
+            
+            var parent = target.parentNode.parentNode.parentNode;
+            parent.parentNode.removeChild(parent);
+            if(!isstorage)
+            {
+            window.parent.parent.parent.myset(paraseq, tempsen);
+            }
+            else
+            {
+            myset(paraseq, tempsen);
+            }
+        }
+        window.onload = function() {
+            danhao = document.getElementById("danhao").value;
+            if (window.localStorage) {
+                isstorage = true;
+            }
+            if (!isstorage) {
+                result = window.parent.parent.parent.modifyPara;
+                
+            }
+            else {
+                var temp = localStorage.getItem(danhao);
+                if (temp) {
+                    result = eval("(" + temp + ")");
+                }
+            }
+            if (result) {
+            	
+                for (var i = 0; i < result.length; i++) {
+                	
+                    //var all = $(":hidden");
+                    var all = getClass("div","modify");
+                   
+                    for (var j = 0; j < all.length; j++) {
+                        if (all[j].getAttribute("paraseq") == result[i].para) {
+                        	
+                            var xiugai = document.createElement("span");
+                            xiugai.setAttribute("style", "font-size:12px;color:#00AEAE;margin-right:10px;");
+                            xiugai.innerHTML = "已修改";
+                            all[j].insertBefore(xiugai, all[j].lastChild);
+                            all[j].lastChild.setAttribute("onclick", "submitPart('" + result[i].text.replace(/\"/g,"\\\"").replace(/\'/g,"\\\'") + "',this)");
+                        }
+                    }
+
+                }
+            }  
+        }
+
+
+        function mydivclick(e,obj) {
+            if (e.target.tagName.toUpperCase() != "INPUT") {
+                obj.lastChild.previousSibling.click();
+            }
+        }
+
+        function getClass(tagname, className) { //tagname指元素，className指class的值
+            var tagname = document.getElementsByTagName(tagname);  //获取指定元素
+            var tagnameAll = [];     //这个数组用于存储所有符合条件的元素
+            for (var i = 0; i < tagname.length; i++) {     //遍历获得的元素
+                if (tagname[i].className == className) {     //如果获得的元素中的class的值等于指定的类名，就赋值给tagnameAll
+                    tagnameAll[tagnameAll.length] = tagname[i];
+                }
+            }
+            return tagnameAll;
+
+        }
+
+       
+        
+        
+         function myset(paraseq, sen) {
+         	
+            var reg = new RegExp("\"", "g")
+            var model = "{\"para\":\"" + paraseq + "\",\"text\": \"" + sen + "\"}";
+            var mo = eval("(" + model + ")");
+            var exist = false;
+            for (var i = 0; i < result.length; i++) {
+                if (mo.para == result[i].para) {
+                    exist = true;
+                    result[i].text = mo.text;
+                }
+            }
+            if (!exist) {
+                result.push(mo);
+            }
+            localStorage.removeItem(danhao);
+            localStorage.setItem(danhao, json_encode(result));
+        }
+        
+        function json_decode(str_json) {
+            // Decodes the JSON representation into a PHP value  
+            //  
+            // version: 906.1806  
+            // discuss at: http://phpjs.org/functions/json_decode  
+            // +      original by: Public Domain (http://www.json.org/json2.js)  
+            // + reimplemented by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)  
+            // + improved by: T.J. Leahy  
+            // *     example 1: json_decode('[\n    "e",\n    {\n    "pluribus": "unum"\n}\n]');  
+            // *     returns 1: ['e', {pluribus: 'unum'}]  
+            /* 
+            http://www.JSON.org/json2.js 
+            2008-11-19 
+            Public Domain. 
+            NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK. 
+            See http://www.JSON.org/js.html 
+            */
+
+            var json = this.window.JSON;
+            if (typeof json === 'object' && typeof json.parse === 'function') {
+                return json.parse(str_json);
+            }
+
+            var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
+            var j;
+            var text = str_json;
+
+            // Parsing happens in four stages. In the first stage, we replace certain  
+            // Unicode characters with escape sequences. JavaScript handles many characters  
+            // incorrectly, either silently deleting them, or treating them as line endings.  
+            cx.lastIndex = 0;
+            if (cx.test(text)) {
+                text = text.replace(cx, function(a) {
+                    return '\\u' +
+            ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+                });
+            }
+
+            // In the second stage, we run the text against regular expressions that look  
+            // for non-JSON patterns. We are especially concerned with '()' and 'new'  
+            // because they can cause invocation, and '=' because it can cause mutation.  
+            // But just to be safe, we want to reject all unexpected forms.  
+
+            // We split the second stage into 4 regexp operations in order to work around  
+            // crippling inefficiencies in IE's and Safari's regexp engines. First we  
+            // replace the JSON backslash pairs with '@' (a non-JSON character). Second, we  
+            // replace all simple value tokens with ']' characters. Third, we delete all  
+            // open brackets that follow a colon or comma or that begin the text. Finally,  
+            // we look to see that the remaining characters are only whitespace or ']' or  
+            // ',' or ':' or '{' or '}'. If that is so, then the text is safe for eval.  
+            if (/^[\],:{}\s]*$/.
+        test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@').
+            replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').
+            replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
+
+                // In the third stage we use the eval function to compile the text into a  
+                // JavaScript structure. The '{' operator is subject to a syntactic ambiguity  
+                // in JavaScript: it can begin a block or an object literal. We wrap the text  
+                // in parens to eliminate the ambiguity.  
+
+                j = eval('(' + text + ')');
+
+                return j;
+            }
+
+            // If the text is not JSON parseable, then a SyntaxError is thrown.  
+            throw new SyntaxError('json_decode');
+        }
+
+        function json_encode(mixed_val) {
+            // Returns the JSON representation of a value  
+            //  
+            // version: 906.1806  
+            // discuss at: http://phpjs.org/functions/json_encode  
+            // +      original by: Public Domain (http://www.json.org/json2.js)  
+            // + reimplemented by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)  
+            // + improved by: T.J. Leahy  
+            // *     example 1: json_encode(['e', {pluribus: 'unum'}]);  
+            // *     returns 1: '[\n    "e",\n    {\n    "pluribus": "unum"\n}\n]'  
+            /* 
+            http://www.JSON.org/json2.js 
+            2008-11-19 
+            Public Domain. 
+            NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK. 
+            See http://www.JSON.org/js.html 
+            */
+            var json = this.window.JSON;
+            if (typeof json === 'object' && typeof json.stringify === 'function') {
+                return json.stringify(mixed_val);
+            }
+
+            var value = mixed_val;
+
+            var quote = function(string) {
+                var escapable = /[\\\"\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
+                var meta = {    // table of character substitutions  
+                    '\b': '\\b',
+                    '\t': '\\t',
+                    '\n': '\\n',
+                    '\f': '\\f',
+                    '\r': '\\r',
+                    '"': '\\"',
+                    '\\': '\\\\'
+                };
+
+                escapable.lastIndex = 0;
+                return escapable.test(string) ?
+        '"' + string.replace(escapable, function(a) {
+            var c = meta[a];
+            return typeof c === 'string' ? c :
+            '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+        }) + '"' :
+        '"' + string + '"';
+            };
+
+            var str = function(key, holder) {
+                var gap = '';
+                var indent = '    ';
+                var i = 0;          // The loop counter.  
+                var k = '';          // The member key.  
+                var v = '';          // The member value.  
+                var length = 0;
+                var mind = gap;
+                var partial = [];
+                var value = holder[key];
+
+                // If the value has a toJSON method, call it to obtain a replacement value.  
+                if (value && typeof value === 'object' &&
+            typeof value.toJSON === 'function') {
+                    value = value.toJSON(key);
+                }
+
+                // What happens next depends on the value's type.  
+                switch (typeof value) {
+                    case 'string':
+                        return quote(value);
+
+                    case 'number':
+                        // JSON numbers must be finite. Encode non-finite numbers as null.  
+                        return isFinite(value) ? String(value) : 'null';
+
+                    case 'boolean':
+                    case 'null':
+                        // If the value is a boolean or null, convert it to a string. Note:  
+                        // typeof null does not produce 'null'. The case is included here in  
+                        // the remote chance that this gets fixed someday.  
+
+                        return String(value);
+
+                    case 'object':
+                        // If the type is 'object', we might be dealing with an object or an array or  
+                        // null.  
+                        // Due to a specification blunder in ECMAScript, typeof null is 'object',  
+                        // so watch out for that case.  
+                        if (!value) {
+                            return 'null';
+                        }
+
+                        // Make an array to hold the partial results of stringifying this object value.  
+                        gap += indent;
+                        partial = [];
+
+                        // Is the value an array?  
+                        if (Object.prototype.toString.apply(value) === '[object Array]') {
+                            // The value is an array. Stringify every element. Use null as a placeholder  
+                            // for non-JSON values.  
+
+                            length = value.length;
+                            for (i = 0; i < length; i += 1) {
+                                partial[i] = str(i, value) || 'null';
+                            }
+
+                            // Join all of the elements together, separated with commas, and wrap them in  
+                            // brackets.  
+                            v = partial.length === 0 ? '[]' :
+                    gap ? '[\n' + gap +
+                    partial.join(',\n' + gap) + '\n' +
+                    mind + ']' :
+                    '[' + partial.join(',') + ']';
+                            gap = mind;
+                            return v;
+                        }
+
+                        // Iterate through all of the keys in the object.  
+                        for (k in value) {
+                            if (Object.hasOwnProperty.call(value, k)) {
+                                v = str(k, value);
+                                if (v) {
+                                    partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                                }
+                            }
+                        }
+
+                        // Join all of the member texts together, separated with commas,  
+                        // and wrap them in braces.  
+                        v = partial.length === 0 ? '{}' :
+                gap ? '{\n' + gap + partial.join(',\n' + gap) + '\n' +
+                mind + '}' : '{' + partial.join(',') + '}';
+                        gap = mind;
+                        return v;
+                }
+            };
+
+            // Make a fake root object containing our value under the key of ''.  
+            // Return the result of stringifying the value.  
+            return str('', {
+                '': value
+            });
+        } 
+       
+    </script>
+	</head>
+
+	<body><a href="http://www.ptcheck.com/tea/segment.aspx" target="_blank" id="a_url" style="display:none;" ></a> <input type="hidden" id="danhao" value="2647220997972225" /><div class="mainContainer"><div align="center" class="navigation"><a href="paper_1.htm"><span class="btn_gray">首页</span></a><a  href="paper_1.htm"><span class="btn_gray">上一页</span></a><a href="paper_3.htm"><span class="btn_gray">下一页</span></a><a href="paper_6.htm">	<span class="btn_gray">尾页</span></a><span>页码：2/6页</span></div><div class="zhengwen"><div class="para"><div class="duanluo"><span>85</span></div><div class="l"><span style="margin-left:25px"></span><span >	测听系统总体架构 </span></div></div><div class="para"><div class="duanluo"><span>86</span></div><div class="l"><span style="margin-left:25px"></span><span >测听系统的整体架构如图3-1所示。 </span><span >基于Android操作系统，利用移动终端硬件资源构建纯音信号生成器模块，并将其用于纯音听阈测试和频率分辨力测试； </span><span >将专业的言语测听所用语音资源内置于系统中，提供言语测听平台； </span><span >耳机、触摸屏等硬件完成受试者和软件系统的交互，得到检测结果。 </span></div><div class="modify" align="right" paraseq="85"><span class="btn btn-blue" onclick="submitPart('测听系统的整体架构如图3-1所示。基于Android操作系统，利用移动终端硬件资源构建纯音信号生成器模块，并将其用于纯音听阈测试和频率分辨力测试；将专业的言语测听所用语音资源内置于系统中，提供言语测听平台；耳机、触摸屏等硬件完成受试者和软件系统的交互，得到检测结果。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>87</span></div><div class="l"><span style="margin-left:25px"></span><span >图3-1测听系统架构框图 </span></div></div><div class="para"><div class="duanluo"><span>88</span></div><div class="l"><span style="margin-left:25px"></span><span >	测听系统主要由硬件和软件两部分构成。 </span><span >硬件部分主要包括CPU、声卡、显示屏以及耳机等等移动设备所具有的硬件资源； </span><a href="../sentence_detail/287.htm" target="right" class="orange">软件部分主要基于Android操作系统编写。各测试模块流程主要通过软件实现；</a><span >交互部分由软硬件共同完成。 </span></div><div class="modify" align="right" paraseq="87"><span class="btn btn-blue" onclick="submitPart('测听系统主要由硬件和软件两部分构成。硬件部分主要包括CPU、声卡、显示屏以及耳机等等移动设备所具有的硬件资源；软件部分主要基于Android操作系统编写。各测试模块流程主要通过软件实现；交互部分由软硬件共同完成。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>89</span></div><div class="l"><span style="margin-left:25px"></span><span >	听力测试软件设计架构 </span></div></div><div class="para"><div class="duanluo"><span>90</span></div><div class="l"><span style="margin-left:25px"></span><span >听力测试系统主要功能通过软件实现， </span><a href="../sentence_detail/291.htm" target="right" class="orange">其功能主要包括：纯音听阈测试、频率分辨力测试（音调分辨力测试）和言语测听（包括言语识别率和言语识别阈）。</a><span >听力测试软件基于Android操作系统，在详细研究国家相关标准的情况下，设计软件流程，完成各听力测试项并保存测试结果，指导助听器验配， </span><span >并为后续补偿算法提供参数。 </span></div><div class="modify" align="right" paraseq="89"><span class="btn btn-blue" onclick="submitPart('听力测试系统主要功能通过软件实现，其功能主要包括：纯音听阈测试、频率分辨力测试（音调分辨力测试）和言语测听（包括言语识别率和言语识别阈）。听力测试软件基于Android操作系统，在详细研究国家相关标准的情况下，设计软件流程，完成各听力测试项并保存测试结果，指导助听器验配，并为后续补偿算法提供参数。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>91</span></div><div class="l"><span style="margin-left:25px"></span><span >	纯音听阈测试 </span></div></div><div class="para"><div class="duanluo"><span>92</span></div><div class="l"><span style="margin-left:25px"></span><span >根据针对听力测试方法的国家标准[GBT 16403]，参考其气导测听方法可知，听阈测试的可分为上升法和升降法，两者测试流程稍有不同[23]。 </span><span >在此标准基础上，本测听系统对其测试流程稍作修改，在不改变任何测试结果的前提下，使该操作流程更加适合智能移动终端软件设计以及方便受试者操作。 </span></div><div class="modify" align="right" paraseq="91"><span class="btn btn-blue" onclick="submitPart('根据针对听力测试方法的国家标准[GBT 16403]，参考其气导测听方法可知，听阈测试的可分为上升法和升降法，两者测试流程稍有不同[23]。在此标准基础上，本测听系统对其测试流程稍作修改，在不改变任何测试结果的前提下，使该操作流程更加适合智能移动终端软件设计以及方便受试者操作。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>93</span></div><div class="l"><span style="margin-left:25px"></span><span >上升法测听阈的操作流程如下： </span></div></div><div class="para"><div class="duanluo"><span>94</span></div><div class="l"><span style="margin-left:25px"></span><span >	从1KHz频点处开始测试，以上一频点的听阈或初始化的声压级作为初始声压级，以5dB一档逐渐增大给声声压级直至受试者反馈听到声音； </span></div><div class="modify" align="right" paraseq="93"><span class="btn btn-blue" onclick="submitPart('从1KHz频点处开始测试，以上一频点的听阈或初始化的声压级作为初始声压级，以5dB一档逐渐增大给声声压级直至受试者反馈听到声音；',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>95</span></div><div class="l"><span style="margin-left:25px"></span><span >	以10dB为一档降低纯音声压级，直至受试者反馈未听到声音，而后每5dB为一档上升给声声压级，直至受试者反馈听到声音； </span></div><div class="modify" align="right" paraseq="94"><span class="btn btn-blue" onclick="submitPart('以10dB为一档降低纯音声压级，直至受试者反馈未听到声音，而后每5dB为一档上升给声声压级，直至受试者反馈听到声音；',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>96</span></div><div class="l"><span style="margin-left:25px"></span><span >	判断是否已是在上升过程中在此声压级做出反应次数已达三次，若是则该声压级即为对应频点的听阈值； </span><span >若不是则继续2)的操作； </span></div><div class="modify" align="right" paraseq="95"><span class="btn btn-blue" onclick="submitPart('判断是否已是在上升过程中在此声压级做出反应次数已达三次，若是则该声压级即为对应频点的听阈值；若不是则继续2)的操作；',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>97</span></div><div class="l"><span style="margin-left:25px"></span><span >	保存测试信息，若还有未测试频点则切换频点从1)开始测试新频点； </span><span >若已是最后的1KHz频点上的测试，则判断最初的1KHz的测试结果与本次测试结果是否相差过大，若相差过大则本次所有频点的测试结果均无效，需重新测试， </span><span >否则测试完毕。 </span></div><div class="modify" align="right" paraseq="96"><span class="btn btn-blue" onclick="submitPart('保存测试信息，若还有未测试频点则切换频点从1)开始测试新频点；若已是最后的1KHz频点上的测试，则判断最初的1KHz的测试结果与本次测试结果是否相差过大，若相差过大则本次所有频点的测试结果均无效，需重新测试，否则测试完毕。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>98</span></div><div class="l"><span style="margin-left:25px"></span><span >上升法测试流程框图如图3-2所示： </span></div></div><div class="para"><div class="duanluo"><span>99</span></div><div class="l"><span style="margin-left:25px"></span><span >图3-2上升法测听阈流程图 </span></div></div><div class="para"><div class="duanluo"><span>100</span></div><div class="l"><span style="margin-left:25px"></span><span >图中上升转换点的定义为，从受试者听不到测试音开始， </span><span >在增强给声声压级的过程中受试者第一次做出听到测试音的反馈所对应的测试点为上升转换点； </span><span >同理，下降转换点为从受试者听到测试音开始，在降低给声声压级的过程中，受试者第一次做出听不到测试音的反馈所对应的测试点为下降转换点。 </span></div><div class="modify" align="right" paraseq="99"><span class="btn btn-blue" onclick="submitPart('图中上升转换点的定义为，从受试者听不到测试音开始，在增强给声声压级的过程中受试者第一次做出听到测试音的反馈所对应的测试点为上升转换点；同理，下降转换点为从受试者听到测试音开始，在降低给声声压级的过程中，受试者第一次做出听不到测试音的反馈所对应的测试点为下降转换点。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>101</span></div><div class="l"><span style="margin-left:25px"></span><span >升降法与上升法稍有不同，主要体现在第二步，操作流程如下： </span></div></div><div class="para"><div class="duanluo"><span>102</span></div><div class="l"><span style="margin-left:25px"></span><span >	从1KHz频点处开始测试，以上一频点的听阈或初始化的声压级作为初始声压级，以5dB一档逐渐增大给声声压级直至受试者反馈听到声音； </span></div><div class="modify" align="right" paraseq="101"><span class="btn btn-blue" onclick="submitPart('从1KHz频点处开始测试，以上一频点的听阈或初始化的声压级作为初始声压级，以5dB一档逐渐增大给声声压级直至受试者反馈听到声音；',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>103</span></div><div class="l"><span style="margin-left:25px"></span><span >	在受试者做出表示听到测试音的反馈后，将给声声压级增加5dB后开始测试，并以5dB一档逐渐减小给声声压级，当达到下降转换点（定义如上）时， </span><span >再将给声声压级减小5dB并开始以5dB为一档增加给声声压级，直至上升转换点，再将给声声压级增加5dB并开始以5dB为一档减小给声声压级， </span><span >如此反复三次（即降三次、升三次）； </span></div><div class="modify" align="right" paraseq="102"><span class="btn btn-blue" onclick="submitPart('在受试者做出表示听到测试音的反馈后，将给声声压级增加5dB后开始测试，并以5dB一档逐渐减小给声声压级，当达到下降转换点（定义如上）时，再将给声声压级减小5dB并开始以5dB为一档增加给声声压级，直至上升转换点，再将给声声压级增加5dB并开始以5dB为一档减小给声声压级，如此反复三次（即降三次、升三次）；',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>104</span></div><div class="l"><span style="margin-left:25px"></span><span >	三次完成，所处声压级即为听阈值。 </span><span >保存测试信息，若还有未测试频点则切换频点从1)开始测试新频点； </span><span >若已是最后的1KHz频点上的测试，则判断最初的1KHz的测试结果与本次测试结果是否相差过大，若相差过大则本次所有频点的测试结果均无效，需重新测试， </span><span >否则测试完毕。 </span></div><div class="modify" align="right" paraseq="103"><span class="btn btn-blue" onclick="submitPart('三次完成，所处声压级即为听阈值。保存测试信息，若还有未测试频点则切换频点从1)开始测试新频点；若已是最后的1KHz频点上的测试，则判断最初的1KHz的测试结果与本次测试结果是否相差过大，若相差过大则本次所有频点的测试结果均无效，需重新测试，否则测试完毕。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>105</span></div><div class="l"><span style="margin-left:25px"></span><span >升降法测试软件操作流程图如图3-3所示： </span></div></div><div class="para"><div class="duanluo"><span>106</span></div><div class="l"><span style="margin-left:25px"></span><span >图3-3升降法测听阈流程图 </span></div></div><div class="para"><div class="duanluo"><span>107</span></div><div class="l"><span style="margin-left:25px"></span><span >	频率分辨力测试 </span></div></div><div class="para"><div class="duanluo"><span>108</span></div><div class="l"><span style="margin-left:25px"></span><span >纯音听阈测试可以反映出受试者在特定频点上的听力级别，但是它没能反映出受试者频率分辨特性，即受试者在此频点出的灵敏度。 </span><span >一般认为，对频率的分辨能力在人对语言的理解至关重要。 </span></div><div class="modify" align="right" paraseq="107"><span class="btn btn-blue" onclick="submitPart('纯音听阈测试可以反映出受试者在特定频点上的听力级别，但是它没能反映出受试者频率分辨特性，即受试者在此频点出的灵敏度。一般认为，对频率的分辨能力在人对语言的理解至关重要。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>109</span></div><div class="l"><span style="margin-left:25px"></span><span >	心理物理调谐曲线法 </span></div></div><div class="para"><div class="duanluo"><span>110</span></div><div class="l"><span style="margin-left:25px"></span><span >理论上而言， </span><a href="../sentence_detail/326.htm" target="right" class="red">频率选择特性的评价方法主要采用心理物理调谐曲线（psychophysical tuning curves, PTCs）法[34]。</a><span >心理物理调谐曲线描述窄带掩蔽信号的中心频率和强度之间的关系。 </span><span >针对某个给定信号，利用窄带噪声信号对其进行掩蔽，为掩蔽原信号所需的窄带噪声信号中心频率和强度之间的对应关系即为一条PTC曲线。 </span><span >其具体测量方法描述如下：固定待测频点信号的声压级和频率，改变用于掩蔽的窄带噪声的中心频率和声压级，当受试者反馈恰好听不到该频点上的纯音信号时， </span><span >则该窄带信号的中心频率点所需的掩蔽强度为此时窄带信号所对应的强度。 </span><span >通过在待测频点的左右各选若干中心频率点进行测试，可得到该频点所给纯音信号所对应的掩蔽信号的频率和强度对应关系， </span><span >将这种对应关系表现在频率-强度图上即是该频点所对应强度下的PTCs。 </span></div><div class="modify" align="right" paraseq="109"><span class="btn btn-blue" onclick="submitPart('理论上而言，频率选择特性的评价方法主要采用心理物理调谐曲线（psychophysical tuning curves, PTCs）法[34]。心理物理调谐曲线描述窄带掩蔽信号的中心频率和强度之间的关系。针对某个给定信号，利用窄带噪声信号对其进行掩蔽，为掩蔽原信号所需的窄带噪声信号中心频率和强度之间的对应关系即为一条PTC曲线。其具体测量方法描述如下：固定待测频点信号的声压级和频率，改变用于掩蔽的窄带噪声的中心频率和声压级，当受试者反馈恰好听不到该频点上的纯音信号时，则该窄带信号的中心频率点所需的掩蔽强度为此时窄带信号所对应的强度。通过在待测频点的左右各选若干中心频率点进行测试，可得到该频点所给纯音信号所对应的掩蔽信号的频率和强度对应关系，将这种对应关系表现在频率-强度图上即是该频点所对应强度下的PTCs。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>111</span></div><div class="l"><span style="margin-left:25px"></span><span >在PTCs的测量过程中，测量软件以何种方式给声，以及受试者以何种方式反馈并没有一个统一的标准。 </span><span >有的学者根据传统的心理物理调谐曲线检测法，在纯音刺激声频率的上下倍频程上选若干频点作为掩蔽噪声中心频率，并调节掩蔽声的声强进行掩蔽测试； </span><span >有的学者通过在刺激声频率上下通过正反向扫频的方式改变掩蔽噪声的中心频率并利用软件自动调节掩蔽噪声的强度， </span><span >受试者只需反馈是否听到刺激纯音信号即可[35]。 </span><span >随着需要测试的中心频点数增加时，PTCs测量的繁琐情况则无法忽略，一次完整的PTCs测量长超过2h~3h，十分耗时， </span><span >且长时间的测试会对受试者的生理造成一定伤害，也使得受试者的反应发生暂时性的改变，影响测试结果，这也使得PTCs在临床上面临一些困难。 </span></div><div class="modify" align="right" paraseq="110"><span class="btn btn-blue" onclick="submitPart('在PTCs的测量过程中，测量软件以何种方式给声，以及受试者以何种方式反馈并没有一个统一的标准。有的学者根据传统的心理物理调谐曲线检测法，在纯音刺激声频率的上下倍频程上选若干频点作为掩蔽噪声中心频率，并调节掩蔽声的声强进行掩蔽测试；有的学者通过在刺激声频率上下通过正反向扫频的方式改变掩蔽噪声的中心频率并利用软件自动调节掩蔽噪声的强度，受试者只需反馈是否听到刺激纯音信号即可[35]。随着需要测试的中心频点数增加时，PTCs测量的繁琐情况则无法忽略，一次完整的PTCs测量长超过2h~3h，十分耗时，且长时间的测试会对受试者的生理造成一定伤害，也使得受试者的反应发生暂时性的改变，影响测试结果，这也使得PTCs在临床上面临一些困难。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>112</span></div><div class="l"><span style="margin-left:25px"></span><span >	改进的频率分辨力测试法 </span></div></div><div class="para"><div class="duanluo"><span>113</span></div><div class="l"><span style="margin-left:25px"></span><span >针对PTCs所面临的测试繁琐问题，结合移动端测试平台的特性，以及测听系统的需求，本文对频率分辨力测试的方法做出改变，提出一种改进的频率测试方法。 </span><span >该方法大大降低测试时长，作为代价，它只测试固定频点上的频率分辨阈，不能得到强度辨别阈和相位辨别阈，同时该方法以将频率分辨能力离散化， </span><span >用固定的频率分辨百分比表征频率分辨能力。 </span><span >该方法可以在一定程度上反应受试者的频率分辨程度，也比较适合移动平台的软硬件实现，因此本文采用该方法作为听力测试系统中频率分辨力评价的方法。 </span></div><div class="modify" align="right" paraseq="112"><span class="btn btn-blue" onclick="submitPart('针对PTCs所面临的测试繁琐问题，结合移动端测试平台的特性，以及测听系统的需求，本文对频率分辨力测试的方法做出改变，提出一种改进的频率测试方法。该方法大大降低测试时长，作为代价，它只测试固定频点上的频率分辨阈，不能得到强度辨别阈和相位辨别阈，同时该方法以将频率分辨能力离散化，用固定的频率分辨百分比表征频率分辨能力。该方法可以在一定程度上反应受试者的频率分辨程度，也比较适合移动平台的软硬件实现，因此本文采用该方法作为听力测试系统中频率分辨力评价的方法。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>114</span></div><div class="l"><span style="margin-left:25px"></span><a href="../sentence_detail/344.htm" target="right" class="orange">本方法的测量范围为125Hz至8000Hz上的11个频率点：125Hz, 250Hz, 500Hz, 750Hz, 1000Hz, 1500Hz,</a><a href="../sentence_detail/345.htm" target="right" class="orange"> 2000Hz, 3000Hz, 4000Hz, 6000Hz, 8000Hz；</a><span >同时，频率辨别阈∆f分为[1/2,1/4,1/8,1/16,1/32,1/64,1/128,1/256,1/512]九个档位。 </span><span >测试步骤如下： </span></div><div class="modify" align="right" paraseq="113"><span class="btn btn-blue" onclick="submitPart('本方法的测量范围为125Hz至8000Hz上的11个频率点：125Hz, 250Hz, 500Hz, 750Hz, 1000Hz, 1500Hz,2000Hz, 3000Hz, 4000Hz, 6000Hz, 8000Hz；同时，频率辨别阈∆f分为[1/2,1/4,1/8,1/16,1/32,1/64,1/128,1/256,1/512]九个档位。测试步骤如下：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>115</span></div><div class="l"><span style="margin-left:25px"></span><span >	选择本轮测试频点。 </span><span >从剩余待测频点中选择本轮测试频点f_i，并生成相应的纯音信号（声压级可由受试者调节固定）； </span></div><div class="modify" align="right" paraseq="114"><span class="btn btn-blue" onclick="submitPart('选择本轮测试频点。从剩余待测频点中选择本轮测试频点f_i，并生成相应的纯音信号（声压级可由受试者调节固定）；',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>116</span></div><div class="l"><span style="margin-left:25px"></span><span >	生成给声信号。 </span><span >当前频偏系数∆f_c初始化为1/2，对比信号频率f_c的取值空间∅={f_i&times;(1-∆f_c ),〖 f〗_i,f_i&times;(1+∆f_c )}， </span><a href="../sentence_detail/352.htm" target="right" class="red">三者出现的概率分别为1/4,1/2,1/4。</a><span >给声信号由该频点纯音和增加偏频之后的信号拼接而成，即&quot;纯音信号——停顿——偏频信号&rdquo;格式，三段信号的时常均为500ms； </span></div><div class="modify" align="right" paraseq="115"><span class="btn btn-blue" onclick="submitPart('生成给声信号。当前频偏系数∆f_c初始化为1/2，对比信号频率f_c的取值空间∅={f_i&times;(1-∆f_c ),〖 f〗_i,f_i&times;(1+∆f_c )}，三者出现的概率分别为1/4,1/2,1/4。给声信号由该频点纯音和增加偏频之后的信号拼接而成，即&quot;纯音信号——停顿——偏频信号&rdquo;格式，三段信号的时常均为500ms；',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>117</span></div><div class="l"><span style="margin-left:25px"></span><span >	受试者选择。 </span><span >受试者再听完所给声之后通过软件进行结果反馈，可选反馈项为，所听到的两段音段相同或不同。 </span><span >此阶段给声三次为一组； </span><span >若受试者在第一组反馈均正确，则将∆f_c下调一档，继续从步骤二开始测试。 </span><span >若第一组的连续三次给声反馈中有错误，则再给一组测试，若全部正确则将∆f_c下调一档，继续从步骤二开始测试； </span><span >若仍有误判，则认为当前∆f_c受试者无法分辨，并将∆f_c的上一档作为该频点的频率辨别阈，若还有为测完频点，步骤一开始继续测试； </span><span >否则测试结束。 </span></div><div class="modify" align="right" paraseq="116"><span class="btn btn-blue" onclick="submitPart('受试者选择。受试者再听完所给声之后通过软件进行结果反馈，可选反馈项为，所听到的两段音段相同或不同。此阶段给声三次为一组；若受试者在第一组反馈均正确，则将∆f_c下调一档，继续从步骤二开始测试。若第一组的连续三次给声反馈中有错误，则再给一组测试，若全部正确则将∆f_c下调一档，继续从步骤二开始测试；若仍有误判，则认为当前∆f_c受试者无法分辨，并将∆f_c的上一档作为该频点的频率辨别阈，若还有为测完频点，步骤一开始继续测试；否则测试结束。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>118</span></div><div class="l"><span style="margin-left:25px"></span><span >频率分辨力测试软件设计流程如图3-4所示： </span></div></div><div class="para"><div class="duanluo"><span>119</span></div><div class="l"><span style="margin-left:25px"></span><span >图3-4 频率分辨力测试流程图 </span></div></div><div class="para"><div class="duanluo"><span>120</span></div><div class="l"><span style="margin-left:25px"></span><span >	言语测听 </span></div></div><div class="para"><div class="duanluo"><span>121</span></div><div class="l"><span style="margin-left:25px"></span><a href="../sentence_detail/364.htm" target="right" class="orange">言语测听在助听器验配和听力检查中具有明显的指导意义，为衡量受试者的言语识别能力提供重要依据。</a><span >言语识别能力可由言语识别率和言语识别阈两个角度表征，故在本软件系统中言语测听分为言语识别率测试和言语识别阈测试两部分。 </span></div><div class="modify" align="right" paraseq="120"><span class="btn btn-blue" onclick="submitPart('言语测听在助听器验配和听力检查中具有明显的指导意义，为衡量受试者的言语识别能力提供重要依据。言语识别能力可由言语识别率和言语识别阈两个角度表征，故在本软件系统中言语测听分为言语识别率测试和言语识别阈测试两部分。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>122</span></div><div class="l"><span style="margin-left:25px"></span><span >言语测听所用语料为由专业播音员录制的双音节扬扬格词，测听方法参考言语测听国家标准GBT 17696-1999[25]。 </span></div><div class="modify" align="right" paraseq="121"><span class="btn btn-blue" onclick="submitPart('言语测听所用语料为由专业播音员录制的双音节扬扬格词，测听方法参考言语测听国家标准GBT 17696-1999[25]。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>123</span></div><div class="l"><span style="margin-left:25px"></span><span >	言语识别率测试 </span></div></div><div class="para"><div class="duanluo"><span>124</span></div><div class="l"><span style="margin-left:25px"></span><span >言语识别率是指在某一固定声压级下，受试者正确识别出的词数所占总测试词库的百分比[25]。 </span><span >测试时，由系统播放测试语料，并通过选择拼音和字的方式反馈，软件统计受试者的反馈结果，并在测试结束时给出测试结果。 </span><span >词库中的语料会以随机的顺序遍历完成，使每个语料均有测试的机会，并不会出现重复的现象。 </span><span >言语识别率测试软件流程如图3-5所示： </span></div><div class="modify" align="right" paraseq="123"><span class="btn btn-blue" onclick="submitPart('言语识别率是指在某一固定声压级下，受试者正确识别出的词数所占总测试词库的百分比[25]。测试时，由系统播放测试语料，并通过选择拼音和字的方式反馈，软件统计受试者的反馈结果，并在测试结束时给出测试结果。词库中的语料会以随机的顺序遍历完成，使每个语料均有测试的机会，并不会出现重复的现象。言语识别率测试软件流程如图3-5所示：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>125</span></div><div class="l"><span style="margin-left:25px"></span><span >图3-5言语识别率测试流程图 </span></div></div><div class="para"><div class="duanluo"><span>126</span></div><div class="l"><span style="margin-left:25px"></span><span >	言语识别阈测试 </span></div></div><div class="para"><div class="duanluo"><span>127</span></div><div class="l"><span style="margin-left:25px"></span><span >言语识别阈（言语接受阈）定义为言语识别率为50%时的给声声压级（dB SPL），故其值可通过言语识别率的测试方式先测出P-I（识别率-强度）曲线， </span><span >再从P-I曲线中50%识别率所对应的声压级读出[25]。 </span></div><div class="modify" align="right" paraseq="126"><span class="btn btn-blue" onclick="submitPart('言语识别阈（言语接受阈）定义为言语识别率为50%时的给声声压级（dB SPL），故其值可通过言语识别率的测试方式先测出P-I（识别率-强度）曲线，再从P-I曲线中50%识别率所对应的声压级读出[25]。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>128</span></div><div class="l"><span style="margin-left:25px"></span><span >除了根据言语识别阈的定义方式进行测量之外，文献[21]参考美国言语听力学会（ASHA）提出的言语识别阈测试指南，给出言语识别阈的另一种测试方法。 </span><span >该方法首先测定受试者完全听懂5个扬扬格词的声压级，并将其作为初始给声言语级，在此声压级的基础上以5dB为一档构建阶梯下降词表， </span><span >软件记录受试者的反馈信息，当在某一声压级上5个测试扬扬格词均未被正确识别则可终止测试，并由如下公式计算言语识别阈： </span></div><div class="modify" align="right" paraseq="127"><span class="btn btn-blue" onclick="submitPart('除了根据言语识别阈的定义方式进行测量之外，文献[21]参考美国言语听力学会（ASHA）提出的言语识别阈测试指南，给出言语识别阈的另一种测试方法。该方法首先测定受试者完全听懂5个扬扬格词的声压级，并将其作为初始给声言语级，在此声压级的基础上以5dB为一档构建阶梯下降词表，软件记录受试者的反馈信息，当在某一声压级上5个测试扬扬格词均未被正确识别则可终止测试，并由如下公式计算言语识别阈：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>129</span></div><div class="l"><span style="margin-left:25px"></span><span >言语识别阈=初始给声声压级-测试中正确应答的数量+2.5dB（校正因子）     （3-1） </span></div><div class="modify" align="right" paraseq="128"><span class="btn btn-blue" onclick="submitPart('言语识别阈=初始给声声压级-测试中正确应答的数量+2.5dB（校正因子）     （3-1）',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>130</span></div><div class="l"><span style="margin-left:25px"></span><span >参考上述测量方法，言语识别阈测试软件设计流程如图3-6所示： </span></div><div class="modify" align="right" paraseq="129"><span class="btn btn-blue" onclick="submitPart('参考上述测量方法，言语识别阈测试软件设计流程如图3-6所示：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>131</span></div><div class="l"><span style="margin-left:25px"></span><span >图3-6言语识别阈测试流程图 </span></div></div><div class="para"><div class="duanluo"><span>132</span></div><div class="l"><span style="margin-left:25px"></span><span >	声强标定 </span></div></div><div class="para"><div class="duanluo"><span>133</span></div><div class="l"><span style="margin-left:25px"></span><span >测听系统软件正常工作的前提的输出音频声压级与显示值相对应。 </span><a href="../sentence_detail/384.htm" target="right" class="orange">测听仪器的校准中常使用声压级（Sound Pressure Level, dB SPL）作为声音强度描述单位，</a><a href="../sentence_detail/385.htm" target="right" class="orange">然而在Android系统中使用整型数控制输出音频的音量。</a><span >因此，使用测听软件进行听力检查之前需要对系统输出音频声压级进行标定和校准。 </span></div><div class="modify" align="right" paraseq="132"><span class="btn btn-blue" onclick="submitPart('测听系统软件正常工作的前提的输出音频声压级与显示值相对应。测听仪器的校准中常使用声压级（Sound Pressure Level, dB SPL）作为声音强度描述单位，然而在Android系统中使用整型数控制输出音频的音量。因此，使用测听软件进行听力检查之前需要对系统输出音频声压级进行标定和校准。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>134</span></div><div class="l"><span style="margin-left:25px"></span><span >测听软件需要以声压级为单位控制输出音频的大小，因此需要对移动设备输出的音频音量和声压级进行一一对应。 </span><span >但是整型数表示的音量数值范围过大，很难全部完成标定； </span><span >而测听系统设计的输出音频声压级范围是0~100dB（考虑到移动设备的输出能力有限），故可以通过选取声压级范围中关键点的方式进行标定， </span><span >非关键点的声压级对应的音量可通过线性差值的方法给出。 </span></div><div class="modify" align="right" paraseq="133"><span class="btn btn-blue" onclick="submitPart('测听软件需要以声压级为单位控制输出音频的大小，因此需要对移动设备输出的音频音量和声压级进行一一对应。但是整型数表示的音量数值范围过大，很难全部完成标定；而测听系统设计的输出音频声压级范围是0~100dB（考虑到移动设备的输出能力有限），故可以通过选取声压级范围中关键点的方式进行标定，非关键点的声压级对应的音量可通过线性差值的方法给出。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>135</span></div><div class="l"><span style="margin-left:25px"></span><span >图3-7Android系统音量与耳机播放声信号声压级定性关系 </span></div><div class="modify" align="right" paraseq="134"><span class="btn btn-blue" onclick="submitPart('图3-7Android系统音量与耳机播放声信号声压级定性关系',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>136</span></div><div class="l"><span style="margin-left:25px"></span><span >受试者接受声信号的耳机端所播放音频的声压级与Android系统的音量对应关系如图3-7所示。 </span><span >软件系统中为标定0~100dB范围内的声压级-音量对应关系每隔5dB标定一个点，其他声压级点所对应的音量数据由线性差值得到。 </span></div><div class="modify" align="right" paraseq="135"><span class="btn btn-blue" onclick="submitPart('受试者接受声信号的耳机端所播放音频的声压级与Android系统的音量对应关系如图3-7所示。软件系统中为标定0~100dB范围内的声压级-音量对应关系每隔5dB标定一个点，其他声压级点所对应的音量数据由线性差值得到。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>137</span></div><div class="l"><span style="margin-left:25px"></span><span >3.4本章小结 </span></div></div><div class="para"><div class="duanluo"><span>138</span></div><div class="l"><span style="margin-left:25px"></span><span >	本章主要介绍基于移动终端的听力测试系统整理架构设计。 </span><span >本章首先分析系统基本需求，对听力测试系统的功能指标及相应听力测试参数进行详细描述； </span><span >随后，对系统的整体架构进行阐述，听力测试系统主要分为硬件系统和软件系统，其中硬件系统即是基于移动终端选取， </span><span >软件系统主要包括各听力测试项以及相关信号提供给和产生源之间的联系。 </span><span >最后针对每种听力测试具体项进行详细分析和设计，听力测试系统主要涵盖纯音测听、频率分辨力测试以及言语测听相关内容。 </span><span >本文第六章将详细描述个软件测试项的软件界面及操作流程等细节。 </span></div><div class="modify" align="right" paraseq="137"><span class="btn btn-blue" onclick="submitPart('本章主要介绍基于移动终端的听力测试系统整理架构设计。本章首先分析系统基本需求，对听力测试系统的功能指标及相应听力测试参数进行详细描述；随后，对系统的整体架构进行阐述，听力测试系统主要分为硬件系统和软件系统，其中硬件系统即是基于移动终端选取，软件系统主要包括各听力测试项以及相关信号提供给和产生源之间的联系。最后针对每种听力测试具体项进行详细分析和设计，听力测试系统主要涵盖纯音测听、频率分辨力测试以及言语测听相关内容。本文第六章将详细描述个软件测试项的软件界面及操作流程等细节。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>139</span></div><div class="l"><span style="margin-left:25px"></span><span >	 响度补偿算法 </span></div></div><div class="para"><div class="duanluo"><span>140</span></div><div class="l"><span style="margin-left:25px"></span><span >现代助听器的核心功能是针对佩戴者的听力损失情况自动调节输出语音的响度、频率等参数，使患者能够在听觉上更好的感觉和理解外界发出的声音[36]。 </span><span >助听器完结合人耳特性、语音信号处理基本原理以及听障患者的听力损失情况对输入声信号进行恰当处理并输出， </span><span >最终提升佩戴者对原声信号接收能力的过程称为响度补偿[37]。 </span><span >因此，响度补偿技术是数字助听器的核心算法，也是影响助听效果的关键因素。 </span></div><div class="modify" align="right" paraseq="139"><span class="btn btn-blue" onclick="submitPart('现代助听器的核心功能是针对佩戴者的听力损失情况自动调节输出语音的响度、频率等参数，使患者能够在听觉上更好的感觉和理解外界发出的声音[36]。助听器完结合人耳特性、语音信号处理基本原理以及听障患者的听力损失情况对输入声信号进行恰当处理并输出，最终提升佩戴者对原声信号接收能力的过程称为响度补偿[37]。因此，响度补偿技术是数字助听器的核心算法，也是影响助听效果的关键因素。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>141</span></div><div class="l"><span style="margin-left:25px"></span><span >一般而言，听力障碍患者的听阈较正常人有不同程度的提升，且其痛阈值也有相应的下降，即可听动态范围下降明显[38]； </span><span >另外针对伴有频率分辨损失的听障患者而言，其语音可懂度的提升需要对输出声音的特定频率进行补偿或伸缩； </span><span >此外，外界声音中常夹杂着噪声，需要有效的抑制噪声以便提高输出语音的可懂度。 </span><span >传统助听器响度补偿算法最基本的处理方式是针对听障患者听觉动态范围的下降进行宽动态范围压缩（WDRC）， </span><span >将声音的响度调节至听障患者剩余的听力范围内[5]。 </span><span >随着助听器相关技术和信号处理技术的不断发展，针对频率分辨力损失的相关补偿方法也被应用于助听器补偿算法中，以提升补偿效果。 </span></div><div class="modify" align="right" paraseq="140"><span class="btn btn-blue" onclick="submitPart('一般而言，听力障碍患者的听阈较正常人有不同程度的提升，且其痛阈值也有相应的下降，即可听动态范围下降明显[38]；另外针对伴有频率分辨损失的听障患者而言，其语音可懂度的提升需要对输出声音的特定频率进行补偿或伸缩；此外，外界声音中常夹杂着噪声，需要有效的抑制噪声以便提高输出语音的可懂度。传统助听器响度补偿算法最基本的处理方式是针对听障患者听觉动态范围的下降进行宽动态范围压缩（WDRC），将声音的响度调节至听障患者剩余的听力范围内[5]。随着助听器相关技术和信号处理技术的不断发展，针对频率分辨力损失的相关补偿方法也被应用于助听器补偿算法中，以提升补偿效果。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>142</span></div><div class="l"><span style="margin-left:25px"></span><span >本章首先分析人耳的听觉相关特性以及响度补偿的基本原理和算法，并针对提高语音的可懂度，对语音信号的共振峰进行相应补偿， </span><span >结合谱对比增强处理提高响度补偿算法性能。 </span></div><div class="modify" align="right" paraseq="141"><span class="btn btn-blue" onclick="submitPart('本章首先分析人耳的听觉相关特性以及响度补偿的基本原理和算法，并针对提高语音的可懂度，对语音信号的共振峰进行相应补偿，结合谱对比增强处理提高响度补偿算法性能。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>143</span></div><div class="l"><span style="margin-left:25px"></span><span >	语音信号基本特性和数字模型 </span></div></div><div class="para"><div class="duanluo"><span>144</span></div><div class="l"><span style="margin-left:25px"></span><span >	语音信号特性 </span></div></div><div class="para"><div class="duanluo"><span>145</span></div><div class="l"><span style="margin-left:25px"></span><span >	短时平稳性 </span></div></div><div class="para"><div class="duanluo"><span>146</span></div><div class="l"><span style="margin-left:25px"></span><span >语音信号在一段较长的发音时间内是非平稳信号，许多针对平稳信号的数字信号处理方法无法使用，然而，语音信号的变化速度是比较缓慢的，研究表明， </span><span >在10ms~30ms时间段内，语音信号可被视为平稳信号进行处理，即语音信号具有短时平稳的特性[39]。 </span><a href="../sentence_detail/419.htm" target="right" class="orange">短时平稳性是语音信号处理的基础，几乎所有传统语音信号处理方法均基于该特性，事实证明，语音信号也确实是具有短时平稳特性的。</a></div><div class="modify" align="right" paraseq="145"><span class="btn btn-blue" onclick="submitPart('语音信号在一段较长的发音时间内是非平稳信号，许多针对平稳信号的数字信号处理方法无法使用，然而，语音信号的变化速度是比较缓慢的，研究表明，在10ms~30ms时间段内，语音信号可被视为平稳信号进行处理，即语音信号具有短时平稳的特性[39]。短时平稳性是语音信号处理的基础，几乎所有传统语音信号处理方法均基于该特性，事实证明，语音信号也确实是具有短时平稳特性的。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>147</span></div><div class="l"><span style="margin-left:25px"></span><span >	清音和浊音 </span></div></div><div class="para"><div class="duanluo"><span>148</span></div><div class="l"><span style="margin-left:25px"></span><span >语音信号一般可分为清音、浊音和爆破音三个部分，其中爆破音所占能量小且无明显规律，一般语音信号处理中均将其忽略[40]。 </span></div><div class="modify" align="right" paraseq="147"><span class="btn btn-blue" onclick="submitPart('语音信号一般可分为清音、浊音和爆破音三个部分，其中爆破音所占能量小且无明显规律，一般语音信号处理中均将其忽略[40]。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>149</span></div><div class="l"><span style="margin-left:25px"></span><a href="../sentence_detail/422.htm" target="right" class="orange">清音是发音时声带不振动情况下产生的语音，相比于浊音，能量较小，不具备周期性且频率成分分布较广。</a><span >针对清音部分所提取的语音特征有助于说话人识别，因为不同说话人，特别是性别不同或年龄差别较大的情况下语音中清音成分往往相差很大。 </span></div><div class="modify" align="right" paraseq="148"><span class="btn btn-blue" onclick="submitPart('清音是发音时声带不振动情况下产生的语音，相比于浊音，能量较小，不具备周期性且频率成分分布较广。针对清音部分所提取的语音特征有助于说话人识别，因为不同说话人，特别是性别不同或年龄差别较大的情况下语音中清音成分往往相差很大。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>150</span></div><div class="l"><span style="margin-left:25px"></span><span >浊音是发音时伴随声带振动的音，占据整个语音六成以上的能量，具有准周期特性，其周期被称为基音周期，该特征广泛的应用于语音相关模式识别中。 </span><a href="../sentence_detail/425.htm" target="right" class="orange">浊音能量主要集中在较低频部分，且其频谱有明显共振峰现象。</a><span >由此可见，浊音部分中蕴含语音中许多关键特征，因此浊音在语音信号处理中至关重要。 </span></div><div class="modify" align="right" paraseq="149"><span class="btn btn-blue" onclick="submitPart('浊音是发音时伴随声带振动的音，占据整个语音六成以上的能量，具有准周期特性，其周期被称为基音周期，该特征广泛的应用于语音相关模式识别中。浊音能量主要集中在较低频部分，且其频谱有明显共振峰现象。由此可见，浊音部分中蕴含语音中许多关键特征，因此浊音在语音信号处理中至关重要。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>151</span></div><div class="l"><span style="margin-left:25px"></span><span >	语音发音数字模型 </span></div></div><div class="para"><div class="duanluo"><span>152</span></div><div class="l"><span style="margin-left:25px"></span><span >人发声过程由呼吸器官、声带和喉头以及口鼻腔等构成的声道和声腔共同作用完成。 </span><span >为了更加深入了解发声机理，学者根据发声器官作用原理对语音信号产生过程建模，得到语音信号发音数字模型。 </span><a href="../sentence_detail/430.htm" target="right" class="orange">从原理上可将发音模型分为三个部分：激励模型、声道模型和辐射模型[41]，分别对应于上述发声器官，其原理框图如下图所示：</a></div><div class="modify" align="right" paraseq="151"><span class="btn btn-blue" onclick="submitPart('人发声过程由呼吸器官、声带和喉头以及口鼻腔等构成的声道和声腔共同作用完成。为了更加深入了解发声机理，学者根据发声器官作用原理对语音信号产生过程建模，得到语音信号发音数字模型。从原理上可将发音模型分为三个部分：激励模型、声道模型和辐射模型[41]，分别对应于上述发声器官，其原理框图如下图所示：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>153</span></div><div class="l"><span style="margin-left:25px"></span><a href="../sentence_detail/431.htm" target="right" class="red">图4-1语音信号产生数字模型</a></div></div><div class="para"><div class="duanluo"><span>154</span></div><div class="l"><span style="margin-left:25px"></span><a href="../sentence_detail/432.htm" target="right" class="orange">由图4-1可知，语音信号产生的数字模型可分为激励源、声道模型和辐射模型三个部分。</a><span >激励模型部分主要模拟清音或浊音，声道部分模拟语音从声带至口鼻腔过程中的共振效应，辐射模型模拟口鼻腔的辐射效果。 </span><a href="../sentence_detail/434.htm" target="right" class="orange">可见，该数字模型以语音信号产生的生理学结构为依据构建。</a></div><div class="modify" align="right" paraseq="153"><span class="btn btn-blue" onclick="submitPart('由图4-1可知，语音信号产生的数字模型可分为激励源、声道模型和辐射模型三个部分。激励模型部分主要模拟清音或浊音，声道部分模拟语音从声带至口鼻腔过程中的共振效应，辐射模型模拟口鼻腔的辐射效果。可见，该数字模型以语音信号产生的生理学结构为依据构建。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>155</span></div><div class="l"><span style="margin-left:25px"></span><span >	激励模型 </span></div></div><div class="para"><div class="duanluo"><span>156</span></div><div class="l"><span style="margin-left:25px"></span><span >激励模型以语音信号中清音浊音产生机理为依据，通过生成周期性脉冲经由声门脉冲模型加权模拟浊音部分； </span><span >利用白噪声序列模拟轻音部分。 </span></div><div class="modify" align="right" paraseq="155"><span class="btn btn-blue" onclick="submitPart('激励模型以语音信号中清音浊音产生机理为依据，通过生成周期性脉冲经由声门脉冲模型加权模拟浊音部分；利用白噪声序列模拟轻音部分。',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>157</span></div><div class="l"><span style="margin-left:25px"></span><span >周期性脉冲序列生成器时域可用冲击函数累加方式表述： </span></div></div><div class="para"><div class="duanluo"><span>158</span></div><div class="l"><span style="margin-left:25px"></span><span >                    （4-1） </span></div></div><div class="para"><div class="duanluo"><span>159</span></div><div class="l"><span style="margin-left:25px"></span><span >其中A表示脉冲加权的幅值。其Z变换频域表示如下： </span></div></div><div class="para"><div class="duanluo"><span>160</span></div><div class="l"><span style="margin-left:25px"></span><span >                              （4-2） </span></div></div><div class="para"><div class="duanluo"><span>161</span></div><div class="l"><span style="margin-left:25px"></span><span >声门脉冲模型通常使用周期性斜三角脉冲来表示，其时域表示为 </span></div></div><div class="para"><div class="duanluo"><span>162</span></div><div class="l"><span style="margin-left:25px"></span><span >                      （4-3） </span></div></div><div class="para"><div class="duanluo"><span>163</span></div><div class="l"><span style="margin-left:25px"></span><span >其中N_1和N_2分别是单个三角脉冲的上升和下降时间。 </span><span >将上式进行Z变换得其系统函数G(z)如下： </span></div><div class="modify" align="right" paraseq="162"><span class="btn btn-blue" onclick="submitPart('其中N_1和N_2分别是单个三角脉冲的上升和下降时间。将上式进行Z变换得其系统函数G(z)如下：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>164</span></div><div class="l"><span style="margin-left:25px"></span><span >                        （4-4） </span></div></div><div class="para"><div class="duanluo"><span>165</span></div><div class="l"><span style="margin-left:25px"></span><span >其中g_1和g_2是常数，G(z)是一个二阶全极点模型。 </span><a href="../sentence_detail/448.htm" target="right" class="orange">因此，模拟浊音激励部分的数字模型系统函数可以表示为：</a></div><div class="modify" align="right" paraseq="164"><span class="btn btn-blue" onclick="submitPart('其中g_1和g_2是常数，G(z)是一个二阶全极点模型。因此，模拟浊音激励部分的数字模型系统函数可以表示为：',this)" class="modify">段落修改</div></div><div class="para"><div class="duanluo"><span>166</span></div><div class="l"><span style="margin-left:25px"></span><span >               （4-5） </span></div></div><div class="para"><div class="duanluo"><span>167</span></div><div class="l"><span style="margin-left:25px"></span><span >	声道模型 </span></div></div><div class="para"><div class="duanluo"><span>168</span></div><div class="l"><span style="margin-left:25px"></span><span >声道模型模拟语音从声带处传出后经由声道腔并在其中共振的现象。 </span><span >声道对激励语音的加权和共振作用形成最终语音中的元音和辅音部分，并在最终语音的语谱图上表现出共振峰特性。 </span><span >所谓共振峰，从语谱图上看表现为在某些频率点上其能量相对较高，颜色较深； </span><span >从发声原理上可解释为声带振动产生的声音在喉口鼻腔内传输时在不同频点出产生共振，使得最终语音某些频率点附近能量较高。 </span></div><div class="modify" align="right" paraseq="167"><span class="btn btn-blue" onclick="submitPart('声道模型模拟语音从声带处传出后经由声道腔并在其中共振的现象。声道对激励语音的加权和共振作用形成最终语音中的元音和辅音部分，并在最终语音的语谱图上表现出共振峰特性。所谓共振峰，从语谱图上看表现为在某些频率点上其能量相对较高，颜色较深；从发声原理上可解释为声带振动产生的声音在喉口鼻腔内传输时在不同频点出产生共振，使得最终语音某些频率点附近能量较高。',this)" class="modify">段落修改</div></div><div align="center" class="navigation"><a href="paper_1.htm"><span class="btn_gray">首页</span></a><a  href="paper_1.htm"><span class="btn_gray">上一页</span></a><a href="paper_3.htm"><span class="btn_gray">下一页</span></a><a href="paper_6.htm">	<span class="btn_gray">尾页</span></a><span>页码：2/6页</span></div><div class="footer"><div align="center" class="a666" style="font-size:14px;padding-top:50px;padding-bottom:30px;"><div>检测报告由 <a class="nounderline" href="http://www.ptcheck.com" target="_blank">PTcheck</a>文献相似度检测系统生成 </div><div>Copyright © 2007-2016 PTcheck </div></div></div></div></body></html>
