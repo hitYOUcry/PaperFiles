@@ -1,4 +1,4 @@
-function [new_wav] = SCE(wavFrame,factor,fs)
+function [new_wav,amp_diff] = SCE(wavFrame,factor,fs)
 pa = 1;
 if size(wavFrame,2) > size(wavFrame,1)
     wavFrame = wavFrame';
@@ -23,6 +23,7 @@ y = 20 * log10(fft_data_amp(1:midN)./pa);
 y_en = y;
 
 %% get formants && enhence
+%{
 [FR BW] = FrameFormant(wavFrame,fs);
 formantNum = length(FR);
 if formantNum > 3
@@ -43,10 +44,11 @@ end
 if p ~= 1
     y(tempM) =  y(tempM) +10;
 end
+%}
 %% mins && maxs
 diff_y = diff(y,1);
-[maxIndex,maxVal] = findpeaks(y);
-[minIndex,minVal] =  findpeaks(-y);
+[maxVal,maxIndex] = findpeaks(y);
+[minVal,minIndex] =  findpeaks(-y);
 minVal = -minVal;
 
 max_len = length(maxIndex);
@@ -143,6 +145,8 @@ end
 %% 
 
 new_fft_amp = pa * power(10,y_en./20);
+
+amp_diff = new_fft_amp - fft_data_amp;
 
 %spec_t = 20 * log10(abs(fft_data_amp(1:midN)));
 new_fft_amp = SPLCompen(fs,new_fft_amp);

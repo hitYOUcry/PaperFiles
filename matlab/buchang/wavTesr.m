@@ -12,6 +12,7 @@ n = size(y,1);
 %% add noise
 %y =  awgn(y,55);
 %% base zero detect
+%{
 for i = 1:n
     if abs(y(i)) > 10e-04
         break;
@@ -25,7 +26,7 @@ end
 y = y(i:j);
 %y = y(1:fs*0.2);
 n = size(y,1);
-
+%}
 %% enframe
 win_len =20 * fs / 1000;
 inc = round( 0.5 * win_len);
