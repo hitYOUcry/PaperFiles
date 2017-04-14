@@ -3,7 +3,7 @@ clear all;
 close all;
 inf = 1E-10;
 %% read wav file
-filename = 'sa1.wav';
+filename = 'sa2.wav';
 %filename = 'TX5_4.wav';
 %filename='si1549.wav';
 [y ,fs] = audioread(filename);
@@ -45,8 +45,9 @@ frame_num = size(s,1);
 for i = 1: frame_num
     x =  s(i,:);
    %  s_new(i,:) = alogTwo(x,7000,fs);
- % s_new(i,:) = comAndTen(x,1,7599,8000,1,7999,fs);
-    s_new(i,:) = alogCore(x,900,8000,8000,8000,5980,8000,fs);
+  %s_new(i,:) = comAndTen(x,1,7599,8000,1,7999,fs);
+  %  s_new(i,:) = alogCore(x,900,8000,8000,8000,5980,8000,fs);
+    s_new(i,:) = alogCore(x,1,8000,8000,8000,4000,8000,fs);
  %   [NewFFT,s_new(i,:)] = alogOne(x,1000,1100,979,1131,fs);
     spec = 20 * log(inf + abs(fft(x)));
     Spe(i,:) = spec(1:(midN-1));
@@ -173,6 +174,28 @@ ylabel('频率 / Hz')
 caxis([-200,30])
 %}
 
+figure;
+subplot(1,2,1)
+imagesc(t,f,Spe');
+axis xy; 
+colormap(jet)
+title('原始频谱');
+xlabel('时间 / s')
+ylabel('频率 / Hz')
+
+%image((0:frame_num) * inc / fs,(0:midN)/N * fs,Spe')
+%axis xy
+%colormap(jet)
+
+subplot(1,2,2)
+%f = (1:(midN*0.75))*fs/win_len;
+imagesc(t,f,Spe_new');
+axis xy; 
+colormap(jet);
+title('频谱压缩后频谱');
+xlabel('时间 / s')
+ylabel('频率 / Hz')
+caxis([-200,30])
 %{
 figure;
 subplot(1,2,1)
