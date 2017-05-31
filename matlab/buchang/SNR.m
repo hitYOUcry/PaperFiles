@@ -101,9 +101,9 @@ plot(x,snr_before,'g');
 hold on
 plot(x,snr_after,'r--');
 %set(gca,'YLim',[0.8 2.1]);
-title(['原始信号 SNR = ',num2str(snr)]);
+title(['原始信号 SNR = ',num2str(snr),'dB']);
 xlabel('SCE factor');
-ylabel('SNR值');
+ylabel('SNR值(dB)');
 legend('处理前SNR','处理后SNR');
 
 subplot(1,2,2);
@@ -112,7 +112,7 @@ plot(x,y_reduce,'g');
 hold on
 plot(x,noise_reduce,'r--');
 %set(gca,'YLim',[0.8 2.1]);
-title(['原始信号 SNR = ',num2str(snr)]);
+title(['原始信号 SNR = ',num2str(snr),'dB']);
 xlabel('SCE factor');
 ylabel('reduce (dB)');
 legend('信号','噪声');
